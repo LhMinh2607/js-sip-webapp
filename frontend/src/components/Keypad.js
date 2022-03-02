@@ -35,6 +35,7 @@ export default function Keypad() {
     // alert(num);
     dispatch(makeACall(num, name));
     // JsSIP.debug.enable('JsSIP:*');
+    
     //JsSIP.debug.enable('JsSIP:Transport JsSIP:RTCSession*');
 
     // let pc = new RTCPeerConnection();
@@ -48,11 +49,16 @@ export default function Keypad() {
     //coolPhone.call('sip:'+extension+'@'+server, options);
     // dispatch(makeACall("0981232607"));
 
-    alert('call in progress');
+    // alert('call in progress');
   }
 
   const callingStatus = useSelector(state=>state.callingStatus);
   const {loading: loadingCall, error: errorCall, connected} = callingStatus;
+
+
+  var audioElement = document.getElementsByTagName("audio");
+
+  
 
   useEffect(()=>{
     window.scrollTo({
@@ -61,10 +67,14 @@ export default function Keypad() {
     if(loadingCall===false && connected===false){
       setOpenPopup(true);
     }
+    // if(connected===true){
+      
+    // }
   }, [loadingCall, connected, openPopup]);
 
   return (
     <div>
+      <audio ref={(audio) => {audioElement = audio}} id="audio-element"></audio>
       {!loadingCall && !connected && <div className='keyPad'>
         <div className='keyRow'>
           <input onChange={e => setNum(e.target.value)} value={num}></input>

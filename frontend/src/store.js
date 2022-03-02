@@ -1,6 +1,6 @@
 import {createStore, compose, applyMiddleware, combineReducers} from 'redux';
 import thunk from 'redux-thunk';
-import { makingACallReducer } from './reducers/callingReducers';
+import { loggingACallReducer, makingACallReducer } from './reducers/callingReducers';
 
 
 
@@ -10,6 +10,7 @@ const initialState = {
 
 const reducer = combineReducers({
     callingStatus: makingACallReducer,
+    loggingACall: loggingACallReducer,
 
 })
 

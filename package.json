@@ -9,7 +9,6 @@
     "express": "^4.17.3",
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
-    "jssip": "^3.9.0",
     "jssip-node-websocket": "^3.0.0",
     "mongoose": "^6.2.3",
     "nodemon": "^2.0.15"

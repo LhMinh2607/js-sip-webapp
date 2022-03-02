@@ -19,13 +19,13 @@ callRouter.post('/number', expressAsyncHandler(async (req, res)=>{
 }));
 
 callRouter.post('/log', expressAsyncHandler(async (req, res)=>{
-    // const calllog = new CallLog({
-    //     name: req.body.name,
-    //     phoneNum: req.body.phoneNumber,
-    //     callType: "call",
-    // });
-    // const newCallLog = await calllog.save();
-    // console.log(req.body.phoneNumber);
+    const calllog = new CallLog({
+        name: req.body.name,
+        phoneNum: req.body.phoneNumber,
+        callType: "call",
+    });
+    const newCallLog = await calllog.save();
+    console.log(req.body.phoneNumber);
 
     res.send({status: 'call ended', calllog: newCallLog});
     

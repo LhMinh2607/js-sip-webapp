@@ -147,7 +147,7 @@ input{
 
 .optionBtn{
   width: 100%;
-  min-height: 3rem;
+  min-height: 2rem;
   color: #fff;
   background-color: transparent;
   border: 0;
@@ -160,7 +160,7 @@ input{
   margin: 5px;
   background: transparent;
   /* float: right; */
-  max-width: 3rem;
+  max-width: 2rem;
 }
 
 .optionBtn:hover{
