@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { makeACall } from '../Actions/callActions';
-
+import { cancelCall, makeACall } from '../Actions/callActions';
+import JsSIP from "jssip";
 // import { CALL_CONNECTED, CALL_DISCONNECTED } from '../consts.js/CallConsts';
 import MessageBox from './MessageBox';
 import Timer from './Timer';
@@ -12,8 +12,65 @@ export default function Keypad() {
   const [num, setNum] = useState('');
   const [name, setName] = useState('Lê Huỳnh Minh');
   const [openPopup, setOpenPopup] = useState(false);
+  const [endCallSession, setEndCallSession] = useState(false);
 
+  var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
 
+  var configuration = {
+      sockets  : [ socket ],
+      uri      : '105@2-test1.gcalls.vn:50061',
+      password : 'test1105',
+      session_timers: false,
+      display_name: name,
+  };
+
+  var ua = new JsSIP.UA(configuration);
+
+  var remoteAudio =  window.document.createElement('audio');
+  window.document.body.appendChild(remoteAudio);
+
+  ua.on('newRTCSession', function(e){ 
+    var rtcSession = e.session;
+		
+
+    rtcSession.connection.addEventListener('addstream',function(e) {  // Or addtrack
+        remoteAudio.srcObject = e.stream;
+        remoteAudio.play();
+    });
+
+    rtcSession.connection.addEventListener('removestream',function(e) { 
+        remoteAudio.srcObject = null;
+        remoteAudio.stop();
+    });
+
+    document.getElementById("endButton").addEventListener('click',function(e) { 
+      cancel(rtcSession);
+      
+  });
+    
+    
+    // rtcSession.on('connection', function(e2) {
+    //     alert(' *** connection', e.originator, e2, e.connection);
+
+    //     // onaddstream
+    //     e2.connection.onaddstream = function(e3) {
+    //         alert(' *** onaddstream', e.originator, e3);
+    //         remoteAudio.srcObject = e3.stream;
+    //         remoteAudio.play();
+    //     }
+    //     onremovestream
+    //     e2.connection.onremovestream = function(e3) {
+    //         alert(' *** onremovestream', e.originator, e3);
+    //         remoteAudio.srcObject = null;
+    //         remoteAudio.stop();
+    //     }
+    // });
+    // alert(JSON.stringify(rtcSession));
+    // if(rtcSession.getReceivers().length > 0) {
+    //     remoteAudio.src = window.URL.createObjectURL(rtcSession.getReceivers()[0]);
+    //     remoteAudio.play();
+    // }
+  });
 
   const input = (value) => {
       setNum(num+value);
@@ -29,11 +86,16 @@ export default function Keypad() {
     setOpenPopup(false);
   }
 
+
+  const cancel = (rtcSession) =>{
+    dispatch(cancelCall(num, name, rtcSession));
+  }
+
   const dispatch = useDispatch();
 
   const makeCall = () => {
     // alert(num);
-    dispatch(makeACall(num, name));
+    dispatch(makeACall(num, name, ua));
     // JsSIP.debug.enable('JsSIP:*');
     
     //JsSIP.debug.enable('JsSIP:Transport JsSIP:RTCSession*');
@@ -56,25 +118,23 @@ export default function Keypad() {
   const {loading: loadingCall, error: errorCall, connected} = callingStatus;
 
 
-  var audioElement = document.getElementsByTagName("audio");
 
   
 
   useEffect(()=>{
-    window.scrollTo({
-      top: 0, 
-    });
+    // window.scrollTo({
+    //   top: 0, 
+    // });
     if(loadingCall===false && connected===false){
       setOpenPopup(true);
     }
     // if(connected===true){
-      
+    // alert(endCallSession);
     // }
-  }, [loadingCall, connected, openPopup]);
+  }, [loadingCall, connected, openPopup, endCallSession]);
 
   return (
     <div>
-      <audio ref={(audio) => {audioElement = audio}} id="audio-element"></audio>
       {!loadingCall && !connected && <div className='keyPad'>
         <div className='keyRow'>
           <input onChange={e => setNum(e.target.value)} value={num}></input>
@@ -121,6 +181,9 @@ export default function Keypad() {
             <button type="submit" value="Forward" className='keyNum round'>Forward</button>
           </div>
         </div>
+        <div className='keyRow'>
+          
+        </div>
       </div>: connected && 
         <div className='keyPad'>
           <div className='keyRow'>
@@ -130,17 +193,27 @@ export default function Keypad() {
             <div className='contentRow'>CONNECTED</div>
           </div>
           <div className='keyRow'>
-              <Timer connectivity={connected}></Timer>
+            <Timer connectivity={connected}></Timer>
           </div>
         </div>
       }
       {openPopup && <MessageBox message="Call Ended" open={openPopup} handleClick={closePopup}></MessageBox>}
       {/* {connected && <div>CONNECTED</div>} */}
       
-      {/* <div className='popup hangup'>
+      {/* <div className='popup cancel'>
         <div className='row center'><i className='fa fa-phone'></i>User Hang up</div>
         <div className='row center'><button className='confirmBtn'>Ok</button></div>
       </div> */}
+      {/* <div className='popup info'>
+        <div className='row center'></div>
+        <div className='row center'><button className='confirmBtn cancel' onClick={cancel}><i className='fa fa-phone red'></i></button></div>
+      </div> */}
+      <div className='keyRow'>
+        <div className='popup info'>
+          <div className='row center'></div>
+          <div className='row center'><button className='confirmBtn red' id="endButton"><i className='fa fa-phone red'></i></button></div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -237,3 +237,8 @@ input{
   justify-content: space-between;
   align-items: center;
 }
+
+.confirmBtn.red{
+  background-color: #ff0000;
+  color: #fff;
+}

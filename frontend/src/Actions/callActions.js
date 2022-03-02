@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET } from '../consts.js/CallConsts';
+import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET } from '../consts.js/CallConsts';
 import JsSIP from "jssip";
 
 
@@ -17,60 +17,37 @@ export const logACall = (phoneNumber, name) => async (dispatch) =>{
     }
 };
 
-export const makeACall = (phoneNumber, name) => async (dispatch) =>{
+export const cancelCall = (phoneNumber, name, rtcSession) => async (dispatch) =>{
+    dispatch({type: CALL_CANCELED_REQUEST, payload: {phoneNumber, name}});
+    // console.log("CALL_CANCELED_REQUEST");
+    try{
+        const {data} = await axios.post(`/api/call/log`, {phoneNumber, name});
+        dispatch({type: CALL_CANCELED_SUCCESSFUL, payload: data});
+        // console.log("CALL_CANCELED_SUCCESSFUL");
+        rtcSession.terminate();
+    }catch(error){
+        dispatch({type: CALL_CANCELED_FAILED, 
+            payload: error.response 
+            && error.response.data.message 
+            ? error.response.data.message
+            : error.message,});
+    }
+}
+
+export const makeACall = (phoneNumber, name, ua) => async (dispatch) =>{
     dispatch({
         type: CALL_REQUEST, payload: {phoneNumber, name}
     });
-    JsSIP.debug.enable('JsSIP:*');
-    var remoteAudio =  window.document.createElement('audio');
-    window.document.body.appendChild(remoteAudio);
-
-
-    var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
-
-    var configuration = {
-        sockets  : [ socket ],
-        uri      : '105@2-test1.gcalls.vn:50061',
-        password : 'test1105',
-        session_timers: false,
-    };
-
-    // var target = '105@2-test1.gcalls.vn:50061';
-
-    var ua = new JsSIP.UA(configuration);
-
-    ua.on('newRTCSession', function(e){ 
-        //alert('tes');
-        var rtcSession = e.session;
-
-        rtcSession.connection.addEventListener('addstream',function(e) {  // Or addtrack
-            remoteAudio.srcObject = e.stream;
-            remoteAudio.play();
-        });
-        // rtcSession.on('connection', function(e2) {
-        //     alert(' *** connection', e.originator, e2, e.connection);
+    JsSIP.debug.disable('JsSIP:*');
     
-        //     // onaddstream
-        //     e2.connection.onaddstream = function(e3) {
-        //         alert(' *** onaddstream', e.originator, e3);
-        //         remoteAudio.srcObject = e3.stream;
-        //         remoteAudio.play();
-        //     }
-        //     onremovestream
-        //     e2.connection.onremovestream = function(e3) {
-        //         alert(' *** onremovestream', e.originator, e3);
-        //         remoteAudio.srcObject = null;
-        //         remoteAudio.stop();
-        //     }
-        // });
-        // alert(JSON.stringify(rtcSession));
-        // if(rtcSession.getReceivers().length > 0) {
-        //     remoteAudio.src = window.URL.createObjectURL(rtcSession.getReceivers()[0]);
-        //     remoteAudio.play();
-        // }
-    });
+
+
+    
+
+    
 
     ua.start();
+    
 
     var eventHandlers = {
         progress: function(e) {
@@ -111,11 +88,11 @@ export const makeACall = (phoneNumber, name) => async (dispatch) =>{
             console.log('AUTHENTICATION_ERROR. Call failed with cause: '+ e.cause);
         }
             console.log('call failed with cause: '+ e.cause);
-            dispatch({type: CALL_FAILED});
+            dispatch({type: CALL_FAILED, payload: 'call failed with cause: '+ e.cause});
         },
         ended: function(e) {
             if (e.cause === JsSIP.C.causes.CANCELED) {
-                //ua.sendMessage(target, 'You or the receiver cancelled the phone call!');
+                //ua.sendMessage(target, 'The receiver cancelled the phone call!');
             }
             console.log('call ended with cause: '+ e.cause);
             dispatch(logACall(phoneNumber, name));
@@ -164,6 +141,6 @@ export const makeACall = (phoneNumber, name) => async (dispatch) =>{
     
 
     ua.call(phoneNumber, options);
-    
+
 };
 
