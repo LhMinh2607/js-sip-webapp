@@ -1,7 +1,7 @@
-import { CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_REQUEST } from "../consts.js/CallConsts";
+import { CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_REQUEST, CALL_RESET } from "../consts.js/CallConsts";
 
 
-export const makingACallReducer = (state = {loading: false}, action) =>{
+export const makingACallReducer = (state = {loading: false, connected: null}, action) =>{
     switch(action.type){
         case CALL_REQUEST: 
             return {loading: true, phoneNum: action.payload};
@@ -15,6 +15,8 @@ export const makingACallReducer = (state = {loading: false}, action) =>{
         //     return {loading: false, connected: false};
         case CALL_FAILED:
             return {loading: false, error: action.payload};
+        case CALL_RESET:
+            return {loading: false, connected: null};
         default:
             return state;
     }

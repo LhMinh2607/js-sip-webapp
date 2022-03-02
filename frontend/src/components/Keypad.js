@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { makeACall } from '../Actions/callActions';
-import JsSIP from "jssip";
-import { CALL_CONNECTED, CALL_DISCONNECTED } from '../consts.js/CallConsts';
+
+// import { CALL_CONNECTED, CALL_DISCONNECTED } from '../consts.js/CallConsts';
+import MessageBox from './MessageBox';
+import Timer from './Timer';
+
 
 export default function Keypad() {
 
   const [num, setNum] = useState('');
   const [name, setName] = useState('Lê Huỳnh Minh');
+  const [openPopup, setOpenPopup] = useState(false);
+
 
 
   const input = (value) => {
@@ -20,99 +25,24 @@ export default function Keypad() {
     setNum("");
   }
 
+  const closePopup = () =>{
+    setOpenPopup(false);
+  }
 
   const dispatch = useDispatch();
 
   const makeCall = () => {
     // alert(num);
     dispatch(makeACall(num, name));
-    var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
-
-    var configuration = {
-        sockets  : [ socket ],
-        uri      : '105@2-test1.gcalls.vn:50061',
-        password : 'test1105',
-        session_timers: false,
-    };
-
-    var target = '105@2-test1.gcalls.vn:50061';
-
-    var ua = new JsSIP.UA(configuration);
-
-    ua.start();
-
     // JsSIP.debug.enable('JsSIP:*');
     //JsSIP.debug.enable('JsSIP:Transport JsSIP:RTCSession*');
 
     // let pc = new RTCPeerConnection();
 
     // Register callbacks to desired call events
-    var eventHandlers = {
-      progress: function(e) {
-        console.log('call is in progress');
-      },
-      failed: function(e) {
-        if (e.cause === JsSIP.C.causes.BUSY) {
-          //ua.sendMessage(target, 'Please, call me later!');
-          console.log(1);
-          console.log('Please, call me later! Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.REJECTED) {
-          //ua.sendMessage(target, 'I dont want to hear from you!');
-          console.log('I dont want to hear from you!. Call failed with cause: '+ e.cause);
-          console.log(2);
-        }
-        if (e.cause === JsSIP.C.causes.UNAVAILABLE) {
-          //ua.sendMessage(target, 'This phone number is unvailable!');
-          console.log('This phone number is unvailable!. Call failed with cause: '+ e.cause);
-          console.log(3);
-        }
-        if (e.cause === JsSIP.C.causes.REDIRECTED) {
-          //ua.sendMessage(target, 'REDIRECTED!');
-          console.log('REDIRECTED. Call failed with cause: '+ e.cause);
-          console.log(4);
-        }
-        if (e.cause === JsSIP.C.causes.NOT_FOUND) {
-          //ua.sendMessage(target, 'NOT_FOUND!');
-          console.log('NOT_FOUND. Call failed with cause: '+ e.cause);
-          console.log(5);
-        }
-        if (e.cause === JsSIP.C.causes.ADDRESS_INCOMPLETE) {
-          //ua.sendMessage(target, 'ADDRESS_INCOMPLETE!');
-          console.log('ADDRESS_INCOMPLETE. Call failed with cause: '+ e.cause);
-          console.log(6);
-        }
-        if (e.cause === JsSIP.C.causes.INCOMPATIBLE_SDP) {
-          //ua.sendMessage(target, 'INCOMPATIBLE_SDP!');
-          console.log('INCOMPATIBLE_SDP. Call failed with cause: '+ e.cause);
-          console.log(7);
-        }
-        if (e.cause === JsSIP.C.causes.AUTHENTICATION_ERROR) {
-          //ua.sendMessage(target, 'AUTHENTICATION_ERROR!');
-          console.log('AUTHENTICATION_ERROR. Call failed with cause: '+ e.cause);
-          console.log(8);
-        }
-        console.log('call failed with cause: '+ e.cause);
-      },
-      ended: function(e) {
-        if (e.cause === JsSIP.C.causes.CANCELED) {
-          //ua.sendMessage(target, 'You or the receiver cancelled the phone call!');
-        }
-        console.log('call ended with cause: '+ e.cause);
-        dispatch({type: CALL_DISCONNECTED});
-      },
-      confirmed: function(e) {
-        console.log('call confirmed');
-        dispatch({type: CALL_CONNECTED});
-      }
-    };
+    
 
-    var options = {
-        'eventHandlers': eventHandlers,
-        'mediaConstraints' : { 'audio': true, 'video': false }
-    };
-
-    ua.call(num, options);
+    
 
     // ua.call('sip:106@2-test1.gcalls.vn:50061', options);
     //coolPhone.call('sip:'+extension+'@'+server, options);
@@ -128,8 +58,10 @@ export default function Keypad() {
     window.scrollTo({
       top: 0, 
     });
-    
-  }, [loadingCall, connected]);
+    if(loadingCall===false && connected===false){
+      setOpenPopup(true);
+    }
+  }, [loadingCall, connected, openPopup]);
 
   return (
     <div>
@@ -185,12 +117,20 @@ export default function Keypad() {
             <div className='contentRow'>{num}</div>
           </div>
           <div className='keyRow'>
-          <div className='contentRow'>CONNECTED</div>
+            <div className='contentRow'>CONNECTED</div>
+          </div>
+          <div className='keyRow'>
+              <Timer connectivity={connected}></Timer>
           </div>
         </div>
       }
+      {openPopup && <MessageBox message="Call Ended" open={openPopup} handleClick={closePopup}></MessageBox>}
       {/* {connected && <div>CONNECTED</div>} */}
       
+      {/* <div className='popup hangup'>
+        <div className='row center'><i className='fa fa-phone'></i>User Hang up</div>
+        <div className='row center'><button className='confirmBtn'>Ok</button></div>
+      </div> */}
     </div>
   )
 }

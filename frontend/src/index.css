@@ -80,7 +80,7 @@ code {
   border-radius: 2rem;
 }
 
-.keyNum:focus{
+.keyNum:active{
   transition: 0.2s;
   color: #fff;
   background-color: #38127a;
@@ -126,7 +126,7 @@ code {
   border-radius: 1rem;
 }
 
-.callButton:focus{
+.callButton:active{
   background-color: #94d699;
   transition: 0.2s;
   color: #14ad21;
@@ -190,4 +190,50 @@ input{
   background-color: #fff;
   transition: 0.1s;
   border: 0rem;
+}
+
+.popup{
+  padding: 3rem;
+  /* text-align: center; */
+  color: #fff;
+  border-radius: 2rem;
+  font-size: 2rem;
+  max-width: 20rem;
+}
+
+.popup.info{
+  background-color:rgb(43, 110, 197);
+}
+
+.popup.hangup{
+  background-color: rgb(180, 35, 35);
+}
+
+.confirmBtn{
+  background-color: rgb(4, 255, 129);
+  color: #000000;
+  padding: 1rem 2rem 1rem 2rem;
+  border-radius: 2rem;
+  font: 1.2rem solid;
+  margin-top: 2rem;
+}
+
+.confirmBtn:hover{
+  transition: 0.2s;
+  background-color: rgb(1, 148, 74);
+  color: #353535;
+  box-shadow: #353535 2rem;
+}
+
+/*From Popup Component reactjs-popup*/
+.popup-content {
+  margin: auto;
+  background: transparent !important;
+  border: 0rem !important;
+  width: auto !important;
+  padding: 0rem !important;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
 }
