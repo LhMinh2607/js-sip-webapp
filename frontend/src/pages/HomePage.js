@@ -10,10 +10,9 @@ export default function HomePage() {
 
   return (
     <div>
-        HomePage
-        <div>
-            <Keypad></Keypad>
-        </div>
+      <div className='homeBackground'>
+          <Keypad></Keypad>
+      </div>
 
 
 

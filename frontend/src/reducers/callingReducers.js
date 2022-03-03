@@ -10,7 +10,7 @@ export const makingACallReducer = (state = {loading: false, connected: null}, ac
         case CALL_CONNECTED:
             return {loading: false, connected: true};
         case CALL_DISCONNECTED:
-            return {loading: false, connected: false, by: "receiver"};
+            return {loading: false, connected: false};
         case CALL_CANCELED_REQUEST:
             return {loading: false, connected: false, by: "caller"};
         // case CALL_HUNG_UP_BY_RECEIVER:

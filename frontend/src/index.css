@@ -1,3 +1,5 @@
+html { height:100%; }
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -57,20 +59,26 @@ code {
 
 .keyNum{
   width: 100%;
-  min-height: 10rem;
+  max-width: 14vh;
+  min-width: 2rem;
+  /* height: 100%;
+  max-height: 10rem;
+  min-height: 2rem; */
+  /* width: 16vh; */
+  height: 14vh;
   color: #fff;
   background-color: transparent;
   border: 0;
-  font-size: large;
+  font-size: 2vh;
   display: inline-block;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   width: calc(32% - 1rem);
-  max-height: 10rem;
   margin: 5px;
   background: transparent;
   /* float: right; */
-  max-width: 10rem;
+  
+  
 }
 
 .keyNum:hover{
@@ -87,21 +95,29 @@ code {
 }
 
 .keyBackspace{
-  min-height: 1rem !important;
-  max-height: 5rem !important;
-  max-width: 5rem !important;
+  min-height: 1vh !important;
+  max-height: 5vh !important;
+  max-width: 5vh !important;
 }
 
 .keyPad{
   background-color: #673ab7;
+  /* opacity: 75%; */
   width: 100%;
   border: 1px solid black;
   display: inline-block;
+  /* padding: 0rem 1rem 0rem 1rem; */
+  height: 100vh;
+  min-width: 10rem;
+  max-width: 35rem;
+  /* min-height: 50rem; */
 }
 
 .keyRow{
   width: 100%;
   text-align: center;
+  min-width: 3rem;
+  /* height: 10vh; */
 }
 
 .keyContent{
@@ -113,8 +129,10 @@ code {
   background-color: #14ad21;
   color: #fff;
   width: 100%;
-  max-width: 20rem;
-  font-size: 3rem;
+  max-width: 30vh;
+  min-width: 2rem;
+  height: 6vh;
+  font-size: 3vh;
   box-shadow: 2rem;
 }
 
@@ -133,16 +151,17 @@ code {
 }
 
 .padding{
-  padding-bottom: 3rem;
+  padding-bottom: 1rem;
 }
 
 input{
-  padding: 1rem;
-  max-width: 12rem;
+  padding: 1vh;
+  max-width: 20vh;
   width: 100%;
-  height: 2rem;
-  font-size: 2rem;
-  margin: 1rem;
+  height: 2vh;
+  font-size: 2vh;
+  margin: 1vh;
+  text-align: center;
 }
 
 .optionBtn{
@@ -238,7 +257,30 @@ input{
   align-items: center;
 }
 
-.confirmBtn.red{
+.callButton.red{
   background-color: #ff0000;
   color: #fff;
 }
+
+.homeBackground{
+  text-align: center;
+  background-color: #38127a;
+}
+
+.coverTheCancelButton{
+  z-index: 9000;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  background-color: #673ab7;
+  height: 6vh;
+  /* min-width: 10rem;
+  max-width: 35rem; */
+}
+
+.invisi{
+  visibility: hidden;
+}
+
