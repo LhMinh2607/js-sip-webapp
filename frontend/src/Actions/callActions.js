@@ -38,8 +38,8 @@ export const makeACall = (phoneNumber, name, ua) => async (dispatch) =>{
     dispatch({
         type: CALL_REQUEST, payload: {phoneNumber, name}
     });
-    JsSIP.debug.disable('JsSIP:*');
     
+    const target = phoneNumber;
 
 
     
@@ -56,40 +56,40 @@ export const makeACall = (phoneNumber, name, ua) => async (dispatch) =>{
         },
         failed: function(e) {
             if (e.cause === JsSIP.C.causes.BUSY) {
-            //ua.sendMessage(target, 'Please, call me later!');
+            ua.sendMessage(target, 'Please, call me later!');
             console.log('Please, call me later! Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.REJECTED) {
-            //ua.sendMessage(target, 'I dont want to hear from you!');
-            console.log('I dont want to hear from you!. Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.UNAVAILABLE) {
-            //ua.sendMessage(target, 'This phone number is unvailable!');
-            console.log('This phone number is unvailable!. Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.REDIRECTED) {
-            //ua.sendMessage(target, 'REDIRECTED!');
-            console.log('REDIRECTED. Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.NOT_FOUND) {
-            //ua.sendMessage(target, 'NOT_FOUND!');
-            console.log('NOT_FOUND. Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.ADDRESS_INCOMPLETE) {
-            //ua.sendMessage(target, 'ADDRESS_INCOMPLETE!');
-            console.log('ADDRESS_INCOMPLETE. Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.INCOMPATIBLE_SDP) {
-            //ua.sendMessage(target, 'INCOMPATIBLE_SDP!');
-            console.log('INCOMPATIBLE_SDP. Call failed with cause: '+ e.cause);
-        }
-        if (e.cause === JsSIP.C.causes.AUTHENTICATION_ERROR) {
-            //ua.sendMessage(target, 'AUTHENTICATION_ERROR!');
-            console.log('AUTHENTICATION_ERROR. Call failed with cause: '+ e.cause);
-        }
-            console.log('call failed with cause: '+ e.cause);
-            dispatch({type: CALL_FAILED, payload: 'call failed with cause: '+ e.cause});
-        },
+            }
+            if (e.cause === JsSIP.C.causes.REJECTED) {
+                ua.sendMessage(target, 'I dont want to hear from you!');
+                console.log('I dont want to hear from you!. Call failed with cause: '+ e.cause);
+            }
+            if (e.cause === JsSIP.C.causes.UNAVAILABLE) {
+                ua.sendMessage(target, 'This phone number is unvailable!');
+                console.log('This phone number is unvailable!. Call failed with cause: '+ e.cause);
+            }
+            if (e.cause === JsSIP.C.causes.REDIRECTED) {
+                ua.sendMessage(target, 'REDIRECTED!');
+                console.log('REDIRECTED. Call failed with cause: '+ e.cause);
+            }
+            if (e.cause === JsSIP.C.causes.NOT_FOUND) {
+                ua.sendMessage(target, 'NOT_FOUND!');
+                console.log('NOT_FOUND. Call failed with cause: '+ e.cause);
+            }
+            if (e.cause === JsSIP.C.causes.ADDRESS_INCOMPLETE) {
+                ua.sendMessage(target, 'ADDRESS_INCOMPLETE!');
+                console.log('ADDRESS_INCOMPLETE. Call failed with cause: '+ e.cause);
+            }
+            if (e.cause === JsSIP.C.causes.INCOMPATIBLE_SDP) {
+                //ua.sendMessage(target, 'INCOMPATIBLE_SDP!');
+                console.log('INCOMPATIBLE_SDP. Call failed with cause: '+ e.cause);
+            }
+            if (e.cause === JsSIP.C.causes.AUTHENTICATION_ERROR) {
+                //ua.sendMessage(target, 'AUTHENTICATION_ERROR!');
+                console.log('AUTHENTICATION_ERROR. Call failed with cause: '+ e.cause);
+            }
+                console.log('call failed with cause: '+ e.cause);
+                dispatch({type: CALL_FAILED, payload: 'call failed with cause: '+ e.cause});
+            },
         ended: function(e) {
             if (e.cause === JsSIP.C.causes.CANCELED) {
                 //ua.sendMessage(target, 'The receiver cancelled the phone call!');

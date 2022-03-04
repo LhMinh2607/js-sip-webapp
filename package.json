@@ -11,9 +11,19 @@
     "jsonwebtoken": "^8.5.1",
     "jssip-node-websocket": "^3.0.0",
     "mongoose": "^6.2.3",
+    "node-polyfill-webpack-plugin": "^1.1.4",
     "nodemon": "^2.0.15"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
   },
   "scripts": {
     "start": "nodemon --watch backend --exec node --experimental-modules backend/server.js"
+  },
+  "devDependencies": {
+    "webpack-dev-middleware": "^5.3.1",
+    "webpack-hot-middleware": "^2.25.1"
   }
 }

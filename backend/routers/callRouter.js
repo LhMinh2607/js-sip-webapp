@@ -13,7 +13,6 @@ callRouter.get('/', expressAsyncHandler(async (req, res)=>{
 
 callRouter.post('/number', expressAsyncHandler(async (req, res)=>{
     // console.log(req.body.phoneNumber);
-
     res.send({status: 'call is in progress', calllog: newCallLog});
     
 }));

@@ -95,14 +95,13 @@ code {
 }
 
 .keyBackspace{
-  min-height: 1vh !important;
-  max-height: 5vh !important;
-  max-width: 5vh !important;
+  height: 14vh;
+  max-width: 14vh;
 }
 
 .keyPad{
   background-color: #673ab7;
-  /* opacity: 75%; */
+  opacity: 75%;
   width: 100%;
   border: 1px solid black;
   display: inline-block;
@@ -111,20 +110,42 @@ code {
   min-width: 10rem;
   max-width: 35rem;
   /* min-height: 50rem; */
+  background:
+      linear-gradient(rgb(111, 0, 255), transparent),
+      linear-gradient(to top left, lime, transparent),
+      linear-gradient(to top right, rgb(0, 140, 255), transparent);
+  background-blend-mode: screen;
+}
+
+.spectrum-background {
+  background:
+      linear-gradient(red, transparent),
+      linear-gradient(to top left, lime, transparent),
+      linear-gradient(to top right, blue, transparent);
+  background-blend-mode: screen;
 }
 
 .keyRow{
   width: 100%;
   text-align: center;
   min-width: 3rem;
+  font-size: 2vh;
   /* height: 10vh; */
 }
 
 .keyContent{
-  padding: 1rem;
+  padding: 1vh;
+  font-size: 4vh;
 }
 
+.keyContent.sub{
+  padding: 1vh;
+  font-size: 2vh !important;
+}
+
+
 .callButton{
+  border: 0rem;
   border-radius: 10rem;
   background-color: #14ad21;
   color: #fff;
@@ -133,7 +154,7 @@ code {
   min-width: 2rem;
   height: 6vh;
   font-size: 3vh;
-  box-shadow: 2rem;
+  /* box-shadow: 2rem; */
 }
 
 .callButton:hover{
@@ -154,19 +175,54 @@ code {
   padding-bottom: 1rem;
 }
 
+
+input.inputBox{
+  background-color: #fff;
+  padding: 4vh;
+  border-radius: 4vh;
+}
+
 input{
   padding: 1vh;
-  max-width: 20vh;
-  width: 100%;
+  width: 30vh;
+  /* width: 100%; */
   height: 2vh;
-  font-size: 2vh;
+  font-size: 4vh;
   margin: 1vh;
   text-align: center;
+  border: 0rem;
+  background-color: transparent;
+  /* opacity: 80%; */
+}
+
+input.phoneNum {
+  text-shadow: 0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21,
+               0 0 50px #14ad21;
+  color: #fff;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 .optionBtn{
   width: 100%;
-  min-height: 2rem;
   color: #fff;
   background-color: transparent;
   border: 0;
@@ -175,11 +231,12 @@ input{
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   width: calc(32% - 1rem);
-  max-height: 5rem;
-  margin: 5px;
+  height: 14vh;
+  /* margin: 0.5vh; */
   background: transparent;
   /* float: right; */
-  max-width: 2rem;
+  width: 14vh;
+  text-align: center;
 }
 
 .optionBtn:hover{
@@ -191,9 +248,8 @@ input{
 
 .contentRow{
   padding: 3rem;
-  font-size: 2rem;
   color: #fff;
-
+  font-size: 4vh;
 }
 
 .keyPad.calling{
@@ -203,6 +259,8 @@ input{
 .keyNum.round{
   border: 0.2rem solid rgb(150, 145, 145);
   border-radius: 5rem;
+  width: 10vh;
+  height: 10vh;
 }
 
 .keyNum.round:hover{
@@ -212,16 +270,31 @@ input{
 }
 
 .popup{
-  padding: 3rem;
+  z-index: 9000;
+  padding: 3vh 3vh 3vh 3vh;
   /* text-align: center; */
   color: #fff;
   border-radius: 2rem;
   font-size: 2rem;
   max-width: 20rem;
+  position: absolute;
+  opacity: 100%;
+  top: 50%;  
+  left: 50%; 
+  transform: translate(-50%, -50%);
 }
 
 .popup.info{
   background-color:rgb(43, 110, 197);
+}
+
+.popup.error{
+  background-color:rgb(182, 70, 62);
+}
+
+.popup.option{
+  background-color:rgb(43, 110, 197);
+  padding: 0vh 3vh 3vh 3vh;
 }
 
 .popup.hangup{
@@ -229,12 +302,13 @@ input{
 }
 
 .confirmBtn{
+  border: 0rem;
   background-color: rgb(4, 255, 129);
   color: #000000;
-  padding: 1rem 2rem 1rem 2rem;
-  border-radius: 2rem;
-  font: 1.2rem solid;
-  margin-top: 2rem;
+  padding: 2vh 4vh 2vh 4vh;
+  border-radius: 2vh;
+  font: 3vh solid;
+  margin-top: 2vh;
 }
 
 .confirmBtn:hover{
@@ -242,6 +316,15 @@ input{
   background-color: rgb(1, 148, 74);
   color: #353535;
   box-shadow: #353535 2rem;
+}
+
+.confirmBtn.xClose{
+  background-color: rgb(255, 0, 0);
+  color: #ffffff;
+  padding: 2vh;
+  border-radius: 5vh;
+  font: 2vh solid;
+  transform: translate(4vh, -4vh);
 }
 
 /*From Popup Component reactjs-popup*/
@@ -267,20 +350,81 @@ input{
   background-color: #38127a;
 }
 
-.coverTheCancelButton{
-  z-index: 9000;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  width: 100%;
-  background-color: #673ab7;
-  height: 6vh;
-  /* min-width: 10rem;
-  max-width: 35rem; */
-}
-
 .invisi{
   visibility: hidden;
 }
 
+.popupCoverup{
+  width: 100%;
+  height: 100vh;
+  background-color: #000000;
+  position: absolute;
+  opacity: 50%;
+  top: 50%;  
+  left: 50%; 
+  transform: translate(-50%, -50%);
+}
+
+button.submitBtn{
+  border-radius: 4vh;
+  width: 40vh;
+  height: 10vh;
+  background-color: #673ab7;
+  color: #fff;
+  font-size: 5vh;
+  border: 0rem;
+  margin: 1vh;
+}
+
+button.submitBtn:hover{
+  border-radius: 4vh;
+  width: 40vh;
+  height: 10vh;
+  background-color: #fff;
+  color: #673ab7;
+  transition: 0.2s;
+}
+
+.scrollable{
+  overflow-y: scroll;
+}
+
+table{
+  margin-top: 2vh;
+  width: 100%;
+  background-color: #0fa7ff;
+  color: #fff;
+}
+
+thead, tbody { display: block; }
+
+tbody {
+  height: 30vh;       
+  overflow-y: auto;    
+  overflow-x: hidden;
+  width: 100%;
+}
+
+thead {
+  height: 4vh;
+  width: 100%;
+  padding-bottom: 4vh;
+}
+
+tbody td{
+  width: 100vh;
+  font-size: 2vh;
+}
+
+thead th {
+  width: 33vh;
+  font-size: 2.5vh;
+}
+
+tr:nth-child(even){
+ background-color: #04c5ff; 
+}
+
+.fixedHeight{
+  height: 10vh !important;
+}

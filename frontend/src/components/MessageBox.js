@@ -1,22 +1,31 @@
 import React, { useState } from 'react'
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
 
 export default function MessageBox(props) {
 
-  const {message, open, handleClick} = props;
+  const {message, open, handleClosePopup, type} = props;
 
   const closePopup = () =>{
-    handleClick();
+    handleClosePopup();
     // alert(open);
   }
 
   return (
-    <Popup open={open} position="center">
-      <div className='popup info'>
-        <div className='row center'><i className='fa fa-phone'></i>{message}</div>
-        <div className='row center'><button className='confirmBtn' onClick={closePopup}>Ok</button></div>
-      </div>
-    </Popup>
+    <>
+      {open && (!type || type && type==="info") ? <div>
+        <div className='popup info'>
+          <div className='row center'><i className='fa fa-phone'></i>{message}</div>
+          <div className='row center'><button className='confirmBtn' onClick={closePopup}>Ok</button></div>
+        </div>
+        <div className='popupCoverup'></div>
+      </div> : type === "error" && 
+        <div>
+          <div className='popup error'>
+            <div className='row center'><i className='fa fa-error'></i>{message}</div>
+            <div className='row center'><button className='confirmBtn' onClick={closePopup}>Ok</button></div>
+          </div>
+          <div className='popupCoverup'></div>
+        </div>
+    }
+    </>
   )
 }
