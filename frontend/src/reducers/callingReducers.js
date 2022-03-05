@@ -1,4 +1,4 @@
-import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET } from "../consts.js/CallConsts";
+import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET, HISTORY_LIST_FAILED, HISTORY_LIST_REQUEST, HISTORY_LIST_SUCCESSFUL } from "../consts.js/CallConsts";
 
 
 export const makingACallReducer = (state = {loading: false, connected: null}, action) =>{
@@ -44,6 +44,19 @@ export const loggingACallReducer = (state = {loading: false, log: null}, action)
         case CALL_LOG_SUCCESSFUL:
             return {loadingLog: false, log: action.payload};
         case CALL_LOG_FAILED:
+            return {loadingLog: false, errorLog: action.payload};
+        default:
+            return state;
+    }
+}
+
+export const historyListReducer = (state = {loading: false}, action) =>{
+    switch(action.type){
+        case HISTORY_LIST_REQUEST:
+            return {loadingLog: true, history: null};
+        case HISTORY_LIST_SUCCESSFUL:
+            return {loadingLog: false, history: action.payload};
+        case HISTORY_LIST_FAILED:
             return {loadingLog: false, errorLog: action.payload};
         default:
             return state;

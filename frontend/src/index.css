@@ -180,14 +180,17 @@ input.inputBox{
   background-color: #fff;
   padding: 4vh;
   border-radius: 4vh;
+  width: 100%;
+  box-sizing:border-box;
+  font-size: 3vh;
 }
 
 input{
   padding: 1vh;
-  width: 30vh;
+  width: 20vh;
   /* width: 100%; */
   height: 2vh;
-  font-size: 4vh;
+  font-size: 3vh;
   margin: 1vh;
   text-align: center;
   border: 0rem;
@@ -207,6 +210,9 @@ input.phoneNum {
                0 0 50px #14ad21,
                0 0 50px #14ad21;
   color: #fff;
+  font-size: 8vh;
+  width: 45vh;
+  height: 10vh;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -252,6 +258,12 @@ input[type=number] {
   font-size: 4vh;
 }
 
+.contentRow.displayNumber{
+  padding: 3rem;
+  color: #fff;
+  font-size: 8vh;
+}
+
 .keyPad.calling{
   height: 100vh;
 }
@@ -270,18 +282,33 @@ input[type=number] {
 }
 
 .popup{
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 9000;
   padding: 3vh 3vh 3vh 3vh;
   /* text-align: center; */
   color: #fff;
-  border-radius: 2rem;
-  font-size: 2rem;
-  max-width: 20rem;
+  border-radius: 2vh;
+  font-size: 3vh;
+  width: 30vh;
+  /* height: 20vh; */
   position: absolute;
   opacity: 100%;
-  top: 50%;  
-  left: 50%; 
-  transform: translate(-50%, -50%);
+  /* left: 0; 
+  right: 0; 
+  margin-left: auto; 
+  margin-right: auto; 
+  top: 0;
+  bottom: 0;
+  margin-top: 40vh;
+  margin-bottom: auto; */
+  background:
+    linear-gradient(rgb(10, 66, 139), transparent),
+    linear-gradient(to top, rgb(50, 122, 218), transparent),
+    linear-gradient(to bottom, rgb(127, 194, 248), transparent);
+  
+  animation: zoomPopup 0.7s;
 }
 
 .popup.info{
@@ -301,6 +328,44 @@ input[type=number] {
   background-color: rgb(180, 35, 35);
 }
 
+@keyframes zoomPopup {
+  0%{
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);  
+  }
+  50%{
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1.4);  
+  }
+  /*60%{
+    transform: scale(1.1);
+  }
+  70%{
+    transform: scale(1.2);
+  }
+  80%{
+    transform: scale(1);
+  }
+  90%{
+    transform: scale(1.1);
+  }
+  100%{
+    transform: scale(1);
+  } */
+}
+
+@keyframes slideUpPopup {
+  from { bottom: 0; }
+  to {
+    top: 50%;
+    left: 50%;
+    transition: 0.5s;
+    transform: translateX(50%);
+  }
+}
+
 .confirmBtn{
   border: 0rem;
   background-color: rgb(4, 255, 129);
@@ -309,6 +374,7 @@ input[type=number] {
   border-radius: 2vh;
   font: 3vh solid;
   margin-top: 2vh;
+  width: 20vh;
 }
 
 .confirmBtn:hover{
@@ -319,12 +385,25 @@ input[type=number] {
 }
 
 .confirmBtn.xClose{
+  text-align: center;
   background-color: rgb(255, 0, 0);
   color: #ffffff;
   padding: 2vh;
   border-radius: 5vh;
   font: 2vh solid;
   transform: translate(4vh, -4vh);
+  width: 8vh;
+  height: 8vh;
+}
+
+.confirmBtn.info{
+  background-color: rgb(4, 255, 129);
+  color: #fff;
+}
+
+.confirmBtn.info:hover{
+  background-color: rgb(1, 146, 74);
+  color: #fff;
 }
 
 /*From Popup Component reactjs-popup*/
@@ -343,6 +422,10 @@ input[type=number] {
 .callButton.red{
   background-color: #ff0000;
   color: #fff;
+}
+
+.hangupIcon{
+  transform: rotate(135deg);
 }
 
 .homeBackground{
@@ -367,19 +450,18 @@ input[type=number] {
 
 button.submitBtn{
   border-radius: 4vh;
-  width: 40vh;
+  width: 100%;
   height: 10vh;
   background-color: #673ab7;
   color: #fff;
   font-size: 5vh;
   border: 0rem;
-  margin: 1vh;
+  /* margin: 1vh; */
+  /* padding: 4vh; */
 }
 
 button.submitBtn:hover{
   border-radius: 4vh;
-  width: 40vh;
-  height: 10vh;
   background-color: #fff;
   color: #673ab7;
   transition: 0.2s;
@@ -393,13 +475,17 @@ table{
   margin-top: 2vh;
   width: 100%;
   background-color: #0fa7ff;
+  background:
+      linear-gradient(rgb(10, 133, 190), transparent),
+      linear-gradient(to top left, rgb(53, 171, 226), transparent),
+      linear-gradient(to top right, rgb(15, 84, 235), transparent);
   color: #fff;
 }
 
 thead, tbody { display: block; }
 
 tbody {
-  height: 30vh;       
+  height: 64vh;       
   overflow-y: auto;    
   overflow-x: hidden;
   width: 100%;
@@ -419,12 +505,35 @@ tbody td{
 thead th {
   width: 33vh;
   font-size: 2.5vh;
+  background-color: #8a4ef3;
 }
 
 tr:nth-child(even){
- background-color: #04c5ff; 
+ background:
+      linear-gradient(rgb(46, 215, 245), transparent),
+      linear-gradient(to top left, rgb(77, 197, 245), transparent),
+      linear-gradient(to top right, rgb(0, 140, 255), transparent);
 }
 
 .fixedHeight{
   height: 10vh !important;
+}
+
+.confirmBtn.back{
+  color: #fff;
+  background-color: #8a4ef3;
+}
+
+.confirmBtn.back:hover{
+  color: #fff;
+  background-color: #693db6;
+}
+
+.timer{
+  color: #fff;
+  height: 20vh !important;
+}
+
+.timer > span{
+  font-size: 4vh;
 }

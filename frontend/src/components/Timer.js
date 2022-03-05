@@ -27,13 +27,13 @@ export default function Timer(props) {
     }, [connectivity]);
     return (
     <div style={{textAlign: 'center'}}>
-        <div style={{fontSize: '10rem'}}>
-        <span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
+        <div className='timer'>
+            <span>{hours}</span><span>:</span><span>{minutes}</span><span>:</span><span>{seconds}</span>
         </div>
-        <p>{isRunning ? 'Running' : 'Not running'}</p>
+        {/* <p>{isRunning ? 'Running' : 'Not running'}</p> */}
         {/* <button onClick={start}>Start</button> */}
-        <button onClick={pause}>Pause</button>
-        {connectivity}
+        {/* <button onClick={pause}>Pause</button> */}
+        {/* {connectivity} */}
         {/* <button onClick={reset}>Reset</button> */}
     </div>
   );

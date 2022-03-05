@@ -5,7 +5,7 @@ import Contact from '../entities/Contact.js';
 
 const contactRouter = express.Router();
 contactRouter.get('/', expressAsyncHandler(async (req, res)=>{
-    const contacts = await Contact.find({});
+    const contacts = await Contact.find({}).sort({name: 1});
 
     res.send(contacts);
 }));

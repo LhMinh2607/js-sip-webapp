@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { cancelCall, makeACall } from '../Actions/callActions';
+import { cancelCall, getAllHistory, makeACall } from '../Actions/callActions';
 import JsSIP from "jssip";
 // import { CALL_CONNECTED, CALL_DISCONNECTED } from '../consts.js/CallConsts';
 import MessageBox from './MessageBox';
@@ -8,6 +8,7 @@ import Timer from './Timer';
 import OptionDialogBox from './OptionDialogBox';
 import { getAContact, getAllContact, saveAContact } from '../Actions/contactActions';
 import { CONTACT_SAVE_RESET } from '../consts.js/CallConsts';
+import DateComponent from '../components/DateComponent';
 
 
 export default function Keypad() {
@@ -22,6 +23,7 @@ export default function Keypad() {
   const [messageBoxContent, setMessageBoxContent] = useState('');
   const [contactNum, setContactNum] = useState('');
   const [contactName, setContactName] = useState('');
+  const [addContact, setAddContact] = useState(false);
   
 
   var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
@@ -196,6 +198,19 @@ export default function Keypad() {
     setOpenDialogBox(false);
   }
 
+  const openHistory = () =>{
+    let audio = new Audio("/MenuSelectionClick.mp3");
+    audio.play();
+    let audio2 = new Audio("/AmbientClick.mp3");
+    audio2.play();
+    if(keypadMode==='keypad'){
+      setKeypadMode('history');
+    }else if(keypadMode==='history'){
+      setKeypadMode('keypad');
+    }
+    setOpenDialogBox(false);
+  }
+
   const submitNewContact = (e) =>{ //Contact
     e.preventDefault();
     var re = new RegExp("[0-9]{10}");
@@ -212,6 +227,7 @@ export default function Keypad() {
       dispatch(saveAContact(contactNum, contactName));
       dispatch(getAllContact());
     }
+    setAddContact(false);
   }
 
   const dialNum = (e) =>{ //Contact
@@ -241,6 +257,12 @@ export default function Keypad() {
     }
   }
 
+  const openAddContact = () =>{
+    let audio2 = new Audio("/AmbientClick.mp3");
+    audio2.play();
+    setAddContact(!addContact);
+  }
+
   const callingStatus = useSelector(state=>state.callingStatus);
   const {loading: loadingCall, error: errorCall, connected} = callingStatus;
 
@@ -252,6 +274,9 @@ export default function Keypad() {
 
   const contactDetail = useSelector(state=>state.contactDetail);
   const {loading: loadingDetail, error: errorDetail, contactInfo} = contactDetail;
+
+  const historyList = useSelector(state=>state.historyList);
+  const {loading: loadingHistory, error: errorHistory, history} = historyList;
 
   // const [width, setWidth] = useState(window.innerWidth);
 
@@ -276,6 +301,7 @@ export default function Keypad() {
       setOpenPopup(true);
     }
     dispatch(getAllContact());
+    dispatch(getAllHistory());
     
     // if(connected===true){
     // alert(endCallSession);
@@ -345,7 +371,7 @@ export default function Keypad() {
         </div>: connected && 
           <div>
             <div className='keyRow'>
-              <div className='contentRow'>{num}</div>
+              <div className='contentRow displayNumber'>{num}</div>
             </div>
             <div className='keyRow'>
               <div className='contentRow'>CONNECTED</div>
@@ -367,29 +393,16 @@ export default function Keypad() {
           <div className='row center'><button className='confirmBtn cancel' onClick={cancel}><i className='fa fa-phone red'></i></button></div>
         </div> */}
         <div><div id="invisi" className='keyRow invisi'>
-          <div className='row center'><button className='callButton red' id="endButton"><i className='fa fa-phone red'></i></button></div>
+          <div className='row center'><button className='callButton red' id="endButton"><i className='fa fa-phone red hangupIcon'></i></button></div>
         </div></div>
         {/* <div className='coverTheCancelButton'>
 
         </div> */}
         {keypadMode==='contact' && 
           <>
-            <form onSubmit={submitNewContact}>
-              <div className='row right'>
-                <button type="submit" value="" className='optionBtn' onClick={openContact}><i className='fas fa-close'></i></button>
-              </div>
-              <div className='keyRow'>
-                <input type="text" className='inputBox' placeholder='Name' id="name" autocomplete="off" onChange={e=>setContactName(e.target.value)}/>
-              </div>
-              <div className='keyRow'>
-                <input type="number" className='inputBox' placeholder='Phone number' id="phoneNum" autocomplete="off" onChange={e=>setContactNum(e.target.value)}/>
-              </div>
-              <div className='keyRow'>
-                <button type="submit" className='submitBtn'>ENTER</button>
-              </div>
-            </form>
-            
-              <div className='scrolltable'>
+            <div className='row right'><button onClick={openContact} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button></div>
+            <div className='row right'><button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div>
+              <div className='row scrolltable'>
                 <table>
                   <thead>
                     <tr>
@@ -413,7 +426,7 @@ export default function Keypad() {
                         {contact.phoneNum}
                       </td>
                       <td>
-                        <button className='callButton' value={contact.phoneNum+"|"+contact.name} onClick={dialNum}>Dial</button>
+                        <button className='callButton' value={contact.phoneNum+"|"+contact.name} onClick={dialNum}><i className='fa fa-mobile'></i></button>
                       </td>
                     </tr>
                   ))}
@@ -422,8 +435,56 @@ export default function Keypad() {
               </div>
           </>
         }
+        {keypadMode==='history' &&
+          <div><div className='row right'><button onClick={openHistory} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button></div>
+            {/* <div className='row right'><button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div> */}
+              <div className='row scrolltable'>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>
+                        Name
+                      </th>
+                      <th>
+                        Phone number
+                      </th>
+                      {/* <th>
+                        Started by
+                      </th>
+                      <th>
+                        Ended by
+                      </th> */}
+                      <th>
+                        Date
+                      </th>
+                      <th>
+                        Dial
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>{history && history.length>0 && history.map(hist=>(
+                    <tr key={hist._id}>
+                      <td>
+                        {hist.name}
+                      </td>
+                      <td>
+                        {hist.phoneNum}
+                      </td>
+                      <td>
+                        {<DateComponent onlyTime={true} passedDate={hist.createdAt}></DateComponent>}
+                      </td>
+                      <td>
+                        <button className='callButton' value={hist.phoneNum+"|"+hist.name} onClick={dialNum}><i className='fa fa-mobile'></i></button>
+                      </td>
+                    </tr>
+                  ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+        }
         {openDialogBox && 
-          <OptionDialogBox open={openDialogBox} handleClosePopup={closeDialogBox} handleOpenContact={openContact}></OptionDialogBox>
+          <OptionDialogBox open={openDialogBox} handleClosePopup={closeDialogBox} handleOpenContact={openContact} handleOpenHistory={openHistory}></OptionDialogBox>
         }
         {loadingSaving ? <></> : errorSaving ? (errorSaving.includes("E11000") ?
           <MessageBox type="error" message="Duplicate phone number detected. Please check the number again." open={true} handleClosePopup={closePopup}></MessageBox> : <MessageBox type="error" message={errorSaving} open={true} handleClosePopup={closePopup}></MessageBox>) :
@@ -431,6 +492,21 @@ export default function Keypad() {
           <MessageBox message={contact.message} open={true} handleClosePopup={closePopup}></MessageBox>
         }
       </div>
+      {addContact && <div className='popup info'><form onSubmit={submitNewContact}>
+        <div className='row right'>
+          <button type="submit" value="" className='confirmBtn xClose' onClick={openAddContact}><i className='fas fa-close'></i></button>
+        </div>
+        <div className='row center'>
+          <input type="text" className='inputBox' placeholder='Name' id="name" autocomplete="off" onChange={e=>setContactName(e.target.value)}/>
+        </div>
+        <div className='row center'>
+          <input type="number" className='inputBox' placeholder='Phone number' id="phoneNum" autocomplete="off" onChange={e=>setContactNum(e.target.value)}/>
+        </div>
+        <div className='row center'>
+          <button type="submit" className='submitBtn'>ENTER</button>
+        </div>
+      </form></div>}
+      
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET } from '../consts.js/CallConsts';
+import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET, HISTORY_LIST_FAILED, HISTORY_LIST_REQUEST, HISTORY_LIST_SUCCESSFUL } from '../consts.js/CallConsts';
 import JsSIP from "jssip";
 
 
@@ -144,3 +144,16 @@ export const makeACall = (phoneNumber, name, ua) => async (dispatch) =>{
 
 };
 
+export const getAllHistory = () => async (dispatch) =>{
+    dispatch({type: HISTORY_LIST_REQUEST});
+    try{
+        const {data} = await axios.get(`/api/call/log/list`);
+        dispatch({type: HISTORY_LIST_SUCCESSFUL, payload: data});
+    }catch(error){
+        dispatch({type: HISTORY_LIST_FAILED, 
+            payload: error.response 
+            && error.response.data.message 
+            ? error.response.data.message
+            : error.message,});
+    }
+};

@@ -5,7 +5,7 @@ import CallLog from '../entities/CallLog.js';
 
 
 const callRouter = express.Router();
-callRouter.get('/', expressAsyncHandler(async (req, res)=>{
+callRouter.get('/log/list', expressAsyncHandler(async (req, res)=>{
     const calllog = await CallLog.find({});
 
     res.send(calllog);

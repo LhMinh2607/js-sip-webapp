@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 export default function OptionDialogBox(props) {
 
-  const {message, open, handleClosePopup, handleOpenContact} = props;
+  const {message, open, handleClosePopup, handleOpenContact, handleOpenHistory} = props;
 
   const closePopup = () =>{
     handleClosePopup();
@@ -13,6 +13,10 @@ export default function OptionDialogBox(props) {
     handleOpenContact();
   }
 
+  const openHistory = () => {
+    handleOpenHistory();
+  }
+
   return (
     <div>
       {open && 
@@ -20,6 +24,8 @@ export default function OptionDialogBox(props) {
         <div className='popup option'>
           <div className='row top right'><button className='confirmBtn xClose' onClick={closePopup}><i className='fa fa-close'></i></button></div>
           <div className='row center'><button className='confirmBtn' onClick={openContact}>Contact</button></div>
+          <div className='row center'><button className='confirmBtn' onClick={openHistory}>History</button></div>
+
         </div>
         <div className='popupCoverup'></div>
       </div>}
