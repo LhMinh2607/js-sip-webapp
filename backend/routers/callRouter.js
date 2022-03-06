@@ -2,6 +2,7 @@ import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import JsSIP from "jssip";
 import CallLog from '../entities/CallLog.js';
+import mongoose from 'mongoose';
 
 
 const callRouter = express.Router();
@@ -33,17 +34,31 @@ callRouter.post('/number', expressAsyncHandler(async (req, res)=>{
 }));
 
 callRouter.post('/log', expressAsyncHandler(async (req, res)=>{
-    // const calllog = new CallLog({
-    //     name: req.body.name,
-    //     phoneNum: req.body.phoneNumber,
-    //     callType: "call",
-    // });
-    // const newCallLog = await calllog.save();
-    // console.log(req.body.phoneNumber);
+    const calllog = new CallLog({
+        name: req.body.name,
+        phoneNum: req.body.phoneNumber,
+        startedBy: req.body.callStartedBy,
+    });
+    const newCallLog = await calllog.save();
+    console.log(req.body.phoneNumber);
 
     // res.send({status: 'call ended', calllog: newCallLog});
-    res.send({status: 'call ended', calllog: "testing phase, logging is temporarily stopped"});
+    // res.send({status: 'call ended', calllog: "testing phase, logging is temporarily stopped"});
+    res.send(newCallLog);
+}));
 
+callRouter.put('/updateLog/:id', expressAsyncHandler(async (req, res)=>{
+    console.log(req.params.id);
+    const calllog = await CallLog.findById(req.params.id);
+    if(calllog){
+        calllog.length = req.body.length;
+        calllog.endedBy = req.body.callEndedBy;
+        calllog.callEndedWithCause = req.body.cause;
+        const newCallLog = await calllog.save();
+        res.send(newCallLog);
+    }else{
+        res.status(404).send({message: "404"});
+    }
 }));
 
 export default callRouter;

@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 const callLogSchema = new mongoose.Schema({
     name: {type: String},
     phoneNum: {type: String, required: true},
-    callType: {type: String, required: true},
+    callStatus: {type: String},
     length: {type: Number},
-    endedBy: {type: String, required: true},
+    endedBy: {type: String},
     startedBy: {type: String, required: true},
-    callEnded: {type: String},
+    callEndedWithCause: {type: String},
 },
     {
         timestamps: true,

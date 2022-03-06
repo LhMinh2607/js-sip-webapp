@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { cancelCall, getAllHistory, makeACall } from '../Actions/callActions';
+import { cancelCall, getAllHistory, logACall, makeACall } from '../Actions/callActions';
 import JsSIP from "jssip";
 // import { CALL_CONNECTED, CALL_DISCONNECTED } from '../consts.js/CallConsts';
 import MessageBox from './MessageBox';
@@ -9,6 +9,7 @@ import OptionDialogBox from './OptionDialogBox';
 import { getAContact, getAllContact, saveAContact } from '../Actions/contactActions';
 import { CONTACT_SAVE_RESET } from '../consts.js/CallConsts';
 import DateComponent from '../components/DateComponent';
+import { useStopwatch  } from 'react-timer-hook'; //from react-timer-hook
 
 
 export default function Keypad() {
@@ -24,6 +25,26 @@ export default function Keypad() {
   const [contactNum, setContactNum] = useState('');
   const [contactName, setContactName] = useState('');
   const [addContact, setAddContact] = useState(false);
+  const [callStartedBy, setCallStartedBy] = useState('You');
+  const [callEndedBy, setCallEndedBy] = useState({number: num, name: name});
+  const [callId, setCallId] = useState('');
+  const [totalLength, setTotalLength] = useState(0);
+
+  const {
+    seconds,
+    minutes,
+    hours,
+    days,
+    isRunning,
+    start,
+    pause,
+    reset,
+  } = useStopwatch({ autoStart: false });
+
+  const stop = () =>{
+    pause();
+  }
+  
   
 
   var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
@@ -38,35 +59,43 @@ export default function Keypad() {
 
   var ua = new JsSIP.UA(configuration);
 
-  var remoteAudio =  window.document.createElement('audio');
-  window.document.body.appendChild(remoteAudio);
+  
 
   JsSIP.debug.disable('JsSIP:*');
 
   ua.on('newRTCSession', function(e){ 
+    var remoteAudio =  window.document.createElement('audio');
+    window.document.body.appendChild(remoteAudio);
+
     var rtcSession = e.session;
-		
+    
 
     rtcSession.connection.addEventListener('addstream',function(e) {  // Or addtrack
       remoteAudio.srcObject = e.stream;
       remoteAudio.play();
     });
 
-    rtcSession.connection.addEventListener('removestream',function(e) { 
-      alert('yes');
-      remoteAudio.srcObject = null;
-      remoteAudio.stop();
-      document.getElementById("invisi").style.visibility = "hidden";
-    });
+    // rtcSession.connection.addEventListener('removestream',function(e) { 
+    //   alert('yes');
+    //   remoteAudio.srcObject = null;
+    //   remoteAudio.stop();
+    //   document.getElementById("invisi").style.visibility = "hidden";
+    // });
 
-    rtcSession.connection.addEventListener('ended', function(e){
-      alert('end');
-      document.getElementById("invisi").style.visibility = "hidden";
-    })
+    // rtcSession.connection.addEventListener('ended', function(e){
+    //   alert('end');
+    //   document.getElementById("invisi").style.visibility = "hidden";
+    // })
 
     document.getElementById("endButton").addEventListener('click',function(e) { 
-      cancel(rtcSession);
-      document.getElementById("invisi").style.visibility = "hidden";
+      // console.log("loading="+loadingCall);
+      // console.log("loading="+connected);
+      // console.log("loading="+log._id);
+      // cancel(rtcSession);
+      rtcSession.terminate();
+      // document.getElementById("invisi").style.visibility = "hidden";
+      // var elem = document.getElementsByTagName("audio"); 
+      // elem.parentNode.removeChild(elem);
     })
     
     rtcSession.on('ended', (e) => {
@@ -96,10 +125,16 @@ export default function Keypad() {
     //     remoteAudio.play();
     // }
   });
+  
+
+  let audioBeep = new Audio("/beep.mp3");
+  let audioAmbientClick = new Audio("/AmbientClick.mp3");
+  let audioMenuSlectionClick = new Audio("/MenuSelectionClick.mp3");
+
 
   const input = (value) => { //Keypad
-    let audio = new Audio("/beep.mp3");
-    audio.play();
+    audioBeep.play();
+    // document.getElementById('audioBeep').play();
     var re = new RegExp("[0-9]");
     console.log(num.length);
     setNum(num+value);
@@ -116,40 +151,56 @@ export default function Keypad() {
   }
 
   const backspace = () => { //Keypad
-    let audio = new Audio("/beep.mp3");
-    audio.play();
-    let audio2 = new Audio("/AmbientClick.mp3");
-    audio2.play();
+    audioBeep.play();
+    audioAmbientClick.play();
     setNum("");
   }
 
   const closePopup = () =>{
     setOpenPopup(false);
     //alert(openPopup);
-    let audio = new Audio("/MenuSelectionClick.mp3");
-    audio.play();
+    audioMenuSlectionClick.play();
     dispatch({type: CONTACT_SAVE_RESET});
   }
 
 
-  const cancel = (rtcSession) =>{
-    let audio = new Audio("/AmbientClick.mp3");
-    audio.play();
-    dispatch(cancelCall(num, name, rtcSession));
+  const cancel = () =>{
+    audioAmbientClick.play();
+    // console.log(callId);
+    // console.log(log._id);
+    // console.log("length="+totalLength);
+    console.log("time="+hours+":"+minutes+":"+seconds);
+    if(log){
+      stop();
+      let totalSeconds = 0;
+      let totalMinutes = 0;
+      let totalTime = 0;
+      totalSeconds=seconds;
+      totalMinutes=totalSeconds+(minutes*60);
+      totalTime=totalMinutes+hours*3600;
+      console.log(hours+":"+minutes+":"+seconds);
+      console.log(totalTime);
+      // setTotalLength(totalTime);
+      dispatch(cancelCall("You", totalTime, "Canceled by user", log._id));
+      document.getElementById("invisi").style.visibility = "hidden";
+    }
   }
 
   const dispatch = useDispatch();
 
   const makeCall = () => {
-    let audio = new Audio("/AmbientClick.mp3");
-    audio.play();
+    audioAmbientClick.play();
+
     if(num.length>10){
       setMessageBoxContent('10 digit-number only');
       setOpenPopup(true);
       setNum("");
     }else{
-    document.getElementById("invisi").style.visibility = "visible";
-    dispatch(makeACall(num, name, ua));}
+      
+      document.getElementById("invisi").style.visibility = "visible";
+      dispatch(makeACall(num, name, callStartedBy, ua));}
+      dispatch(logACall(num, name, callStartedBy));
+      
     // JsSIP.debug.enable('JsSIP:*');
     
     //JsSIP.debug.enable('JsSIP:Transport JsSIP:RTCSession*');
@@ -169,27 +220,22 @@ export default function Keypad() {
   }
 
   const openOptionDialogBox = () => {
-    let audio = new Audio("/MenuSelectionClick.mp3");
-    audio.play();
-    let audio2 = new Audio("/AmbientClick.mp3");
-    audio2.play();
+    audioBeep.play();
+    audioAmbientClick.play();
     
     setOpenDialogBox(true);
   }
 
   const closeDialogBox = () =>{ 
-    let audio = new Audio("/MenuSelectionClick.mp3");
-    audio.play();
-    let audio2 = new Audio("/AmbientClick.mp3");
-    audio2.play();
+    audioMenuSlectionClick.play();
+    audioAmbientClick.play();
     setOpenDialogBox(false);
   }
 
   const openContact = () => { //Contact
-    let audio = new Audio("/MenuSelectionClick.mp3");
-    audio.play();
-    let audio2 = new Audio("/AmbientClick.mp3");
-    audio2.play();
+    dispatch(getAllContact());
+    audioMenuSlectionClick.play();
+    audioAmbientClick.play();
     if(keypadMode==='keypad'){
       setKeypadMode('contact');
     }else if(keypadMode==='contact'){
@@ -199,10 +245,9 @@ export default function Keypad() {
   }
 
   const openHistory = () =>{
-    let audio = new Audio("/MenuSelectionClick.mp3");
-    audio.play();
-    let audio2 = new Audio("/AmbientClick.mp3");
-    audio2.play();
+    dispatch(getAllHistory());
+    audioMenuSlectionClick.play();
+    audioAmbientClick.play();
     if(keypadMode==='keypad'){
       setKeypadMode('history');
     }else if(keypadMode==='history'){
@@ -236,10 +281,8 @@ export default function Keypad() {
     setName(e.currentTarget.value.split("|")[1]);
     dispatch(getAContact(e.currentTarget.value.split("|")[0]));
     setKeypadMode('keypad');
-    let audio = new Audio("/beep.mp3");
-    audio.play();
-    let audio2 = new Audio("/AmbientClick.mp3");
-    audio2.play();
+    audioBeep.play();
+    audioAmbientClick.play();
   }
 
   const setNumFromKeyboard = (e) =>{ //Keypad
@@ -258,8 +301,7 @@ export default function Keypad() {
   }
 
   const openAddContact = () =>{
-    let audio2 = new Audio("/AmbientClick.mp3");
-    audio2.play();
+    audioAmbientClick.play();
     setAddContact(!addContact);
   }
 
@@ -278,6 +320,9 @@ export default function Keypad() {
   const historyList = useSelector(state=>state.historyList);
   const {loading: loadingHistory, error: errorHistory, history} = historyList;
 
+  const loggingACall = useSelector(state=>state.loggingACall);
+  const {loading: loadingLog, error: errorLog, log} = loggingACall
+
   // const [width, setWidth] = useState(window.innerWidth);
 
   // const isMobile = width <= 1024;
@@ -293,20 +338,29 @@ export default function Keypad() {
     //   top: 0, 
     // });
     
-    
     setPopupType('info');
     // handleWindowResize();
     if(keypadMode==='keypad' && loadingCall===false && connected===false){
+      // stop();
       setMessageBoxContent('Call Ended');
       setOpenPopup(true);
     }
-    dispatch(getAllContact());
-    dispatch(getAllHistory());
+    if(connected){
+      reset();
+      start();
+      // console.log(callId);
+    }
+    if(log){
+      setCallId(log._id);
+      console.log("log._id="+log._id);
+    }
+    // alert(callId);
+    console.log('callId='+callId);
     
     // if(connected===true){
     // alert(endCallSession);
     // }
-  }, [loadingCall, connected, openPopup, endCallSession]);
+  },[loadingCall, connected, openPopup, endCallSession, log, callId]);
 
   return (
     <div>
@@ -377,7 +431,17 @@ export default function Keypad() {
               <div className='contentRow'>CONNECTED</div>
             </div>
             <div className='keyRow'>
-              <Timer connectivity={connected}></Timer>
+              {/* <Timer connectivity={connected}></Timer> */}
+              <div style={{textAlign: 'center'}}>
+                <div className='timer'>
+                    <span>{hours<10 ? "0"+hours : hours}</span><span>:</span><span>{minutes<10 ? "0"+minutes : minutes}</span><span>:</span><span>{seconds<10 ? "0"+seconds : seconds}</span>
+                </div>
+                {/* <p>{isRunning ? 'Running' : 'Not running'}</p> */}
+                {/* <button onClick={start}>Start</button> */}
+                {/* <button onClick={pause}>Pause</button> */}
+                {/* {connectivity} */}
+                {/* <button onClick={reset}>Reset</button> */}
+            </div>
             </div>
           </div>
         }
@@ -393,7 +457,7 @@ export default function Keypad() {
           <div className='row center'><button className='confirmBtn cancel' onClick={cancel}><i className='fa fa-phone red'></i></button></div>
         </div> */}
         <div><div id="invisi" className='keyRow invisi'>
-          <div className='row center'><button className='callButton red' id="endButton"><i className='fa fa-phone red hangupIcon'></i></button></div>
+          <div className='row center'><button className='callButton red' id="endButton" onClick={cancel}><i className='fa fa-phone red hangupIcon'></i></button></div>
         </div></div>
         {/* <div className='coverTheCancelButton'>
 
@@ -549,6 +613,7 @@ export default function Keypad() {
         </div>
         <div className='popupCoverup'></div>
       </div>}
+     
       
     </div>
   )

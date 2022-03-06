@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET, HISTORY_LIST_FAILED, HISTORY_LIST_REQUEST, HISTORY_LIST_SUCCESSFUL } from '../consts.js/CallConsts';
+import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET, CALL_UPDATE_LOG_FAILED, CALL_UPDATE_LOG_REQUEST, CALL_UPDATE_LOG_SUCCESSFUL, HISTORY_LIST_FAILED, HISTORY_LIST_REQUEST, HISTORY_LIST_SUCCESSFUL } from '../consts.js/CallConsts';
 import JsSIP from "jssip";
 
 
-export const logACall = (phoneNumber, name) => async (dispatch) =>{
-    dispatch({type: CALL_LOG_REQUEST, payload: {phoneNumber, name}});
+export const logACall = (phoneNumber, name, callStartedBy) => async (dispatch) =>{
+    dispatch({type: CALL_LOG_REQUEST, payload: {phoneNumber, name, callStartedBy}});
     try{
-        const {data} = await axios.post(`/api/call/log`, {phoneNumber, name});
+        const {data} = await axios.post(`/api/call/log`, {phoneNumber, name, callStartedBy});
         dispatch({type: CALL_LOG_SUCCESSFUL, payload: data});
     }catch(error){
         dispatch({type: CALL_LOG_FAILED, 
@@ -17,14 +17,29 @@ export const logACall = (phoneNumber, name) => async (dispatch) =>{
     }
 };
 
-export const cancelCall = (phoneNumber, name, rtcSession) => async (dispatch) =>{
-    dispatch({type: CALL_CANCELED_REQUEST, payload: {phoneNumber, name}});
-    // console.log("CALL_CANCELED_REQUEST");
+// export const updateACallLog = (callEndedBy, length, cause) => async (dispatch) =>{
+//     dispatch({type: CALL_UPDATE_LOG_REQUEST, payload: {callEndedBy, length, cause}});
+//     try{
+//         const {data} = await axios.post(`/api/call/updateLog`, {callEndedBy, length, cause});
+//         dispatch({type: CALL_UPDATE_LOG_SUCCESSFUL, payload: data});
+//     }catch(error){
+//         dispatch({type: CALL_UPDATE_LOG_FAILED, 
+//             payload: error.response 
+//             && error.response.data.message 
+//             ? error.response.data.message
+//             : error.message,});
+//     }
+// };
+
+export const cancelCall = (callEndedBy, length, cause, id) => async (dispatch) =>{
+    dispatch({type: CALL_CANCELED_REQUEST, payload: {callEndedBy, length, cause, id}});
+    console.log(length);
     try{
-        const {data} = await axios.post(`/api/call/log`, {phoneNumber, name});
+        const {data} = await axios.put(`/api/call/updateLog/${id}`, {callEndedBy, length, cause, id});
         dispatch({type: CALL_CANCELED_SUCCESSFUL, payload: data});
-        // console.log("CALL_CANCELED_SUCCESSFUL");
-        rtcSession.terminate();
+        dispatch({type: CALL_DISCONNECTED});
+        dispatch({type: CALL_RESET});
+        // rtcSession.terminate();
     }catch(error){
         dispatch({type: CALL_CANCELED_FAILED, 
             payload: error.response 
@@ -34,17 +49,14 @@ export const cancelCall = (phoneNumber, name, rtcSession) => async (dispatch) =>
     }
 }
 
-export const makeACall = (phoneNumber, name, ua) => async (dispatch) =>{
+
+
+export const makeACall = (phoneNumber, name, callStartedBy, ua) => async (dispatch) =>{
     dispatch({
-        type: CALL_REQUEST, payload: {phoneNumber, name}
+        type: CALL_REQUEST, payload: {phoneNumber, name, callStartedBy}
     });
     
     const target = phoneNumber;
-
-
-    
-
-    
 
     ua.start();
     
@@ -90,14 +102,15 @@ export const makeACall = (phoneNumber, name, ua) => async (dispatch) =>{
                 console.log('call failed with cause: '+ e.cause);
                 dispatch({type: CALL_FAILED, payload: 'call failed with cause: '+ e.cause});
             },
+            
         ended: function(e) {
             if (e.cause === JsSIP.C.causes.CANCELED) {
                 //ua.sendMessage(target, 'The receiver cancelled the phone call!');
             }
-            console.log('call ended with cause: '+ e.cause);
-            dispatch(logACall(phoneNumber, name));
             dispatch({type: CALL_DISCONNECTED});
             dispatch({type: CALL_RESET});
+            console.log('call ended with cause: '+ e.cause);
+            
         },
         confirmed: function(e) {
             console.log('call confirmed');

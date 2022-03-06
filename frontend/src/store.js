@@ -1,6 +1,6 @@
 import {createStore, compose, applyMiddleware, combineReducers} from 'redux';
 import thunk from 'redux-thunk';
-import { cancelCallReducer, historyListReducer, loggingACallReducer, makingACallReducer } from './reducers/callingReducers';
+import { cancelCallReducer, historyListReducer, loggingACallReducer, makingACallReducer, updatingACallReducer } from './reducers/callingReducers';
 import { contactDetailReducer, contactListReducer, contactSavingReducer } from './reducers/contactReducers';
 
 
@@ -17,6 +17,7 @@ const reducer = combineReducers({
     contactList: contactListReducer,
     contactDetail: contactDetailReducer,
     historyList: historyListReducer,
+    updatingACall: updatingACallReducer,
 })
 
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

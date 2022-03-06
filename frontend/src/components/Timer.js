@@ -19,9 +19,14 @@ export default function Timer(props) {
         console.log(hours+":"+minutes+":"+seconds)
         pause();
     }
+    var totalTime = 0; //in seconds
 
     useEffect(()=>{
         if(connectivity===false){
+            totalTime=seconds;
+            totalTime+=minutes*60;
+            totalTime+=hours*3600;
+            alert(totalTime);
             stop();
         }
     }, [connectivity]);
