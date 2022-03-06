@@ -315,7 +315,7 @@ export default function Keypad() {
           <div className='keyRow'>
             <input className='phoneNum' type="number" onChange={setNumFromKeyboard} value={num} pattern="[0-9]{10}"></input>
           </div>
-          <div className='row center fixedHeight'>
+          <div className='keyRow'>
             {/* <div className='contentRow'>{name}</div> */}
             <div className='contentRow'>{contactInfo && contactInfo.name}</div>
           </div>
@@ -336,7 +336,7 @@ export default function Keypad() {
           </div>
           <div className='keyRow'>
             {/* <button className='keyNum'><div className='keyContent'>*</div></button> */}
-            <button type="submit" value="" className='optionBtn' onClick={openOptionDialogBox}><i className='fas fa-ellipsis-v'></i></button>
+            <button type="submit" value="" className='keyNum' onClick={openOptionDialogBox}><i className='fas fa-ellipsis-v'></i></button>
 
             <button type="submit" value="0" onClick={() => input("0")} className='keyNum'><div className='keyContent'>0</div><div>+</div></button>
             {/* <button className='keyNum'><div className='keyContent'>#</div></button> */}
@@ -402,8 +402,8 @@ export default function Keypad() {
           <>
             <div className='row right'><button onClick={openContact} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button></div>
             <div className='row right'><button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div>
-              <div className='row scrolltable'>
-                <table>
+              <div className='row inline scrollableDiv'>
+                {/* <table>
                   <thead>
                     <tr>
                       <th>
@@ -431,14 +431,26 @@ export default function Keypad() {
                     </tr>
                   ))}
                   </tbody>
-                </table>
+                </table> */}
+                <div className='col-2'>
+                  {contacts && contacts.length>0 && contacts.map(contact=>(
+                    <div className='row left inline' key={contact._id}>
+                      <div className='col-1 inline'>
+                        <div className='displayNameContact row left'>{contact.name}</div><div className='displayNumberContact row left'>{contact.phoneNum}</div>
+                      </div>
+                      <div className='col-1 inline'>
+                        <div className='row right'><button className='callButton dial' value={contact.phoneNum+"|"+contact.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
           </>
         }
         {keypadMode==='history' &&
           <div><div className='row right'><button onClick={openHistory} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button></div>
-            {/* <div className='row right'><button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div> */}
-              <div className='row scrolltable'>
+            <div className='row right'><button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div>
+              {/* <div className='row scrolltable'>
                 <table>
                   <thead>
                     <tr>
@@ -448,12 +460,12 @@ export default function Keypad() {
                       <th>
                         Phone number
                       </th>
-                      {/* <th>
+                      <th>
                         Started by
                       </th>
                       <th>
                         Ended by
-                      </th> */}
+                      </th>
                       <th>
                         Date
                       </th>
@@ -480,6 +492,30 @@ export default function Keypad() {
                   ))}
                   </tbody>
                 </table>
+              </div>  */}
+              <div className='scrollableDiv'>
+                <div className='col-2'>
+                  {history && history.length>0 && history.map(hist=>(
+                    <div key={hist._id}>
+                      <div className='row center displayNumberContact'>{hist._id}</div>
+                      {hist.list.map(l=>(
+                        <div className='row left inline' key={l._id}>
+                          <div className='col-1 inline'>
+                            <div className='displayNameContact row left'>{l.name}</div><div className='displayNumberContact row left'>{l.phoneNum}</div>
+                          </div>
+                          <div className='col-1 inline'>
+                            <div className='row'>
+                              <div className='col-1 right displayNumberContact'><DateComponent passedDate={l.createdAt} onlyTime={true}></DateComponent></div>
+                              <div className='col-1 right'><button className='callButton dial' value={l.phoneNum+"|"+l.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
+                            </div>
+                            
+                          </div>
+                        </div>
+                      ))
+                      }
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
         }
@@ -492,20 +528,27 @@ export default function Keypad() {
           <MessageBox message={contact.message} open={true} handleClosePopup={closePopup}></MessageBox>
         }
       </div>
-      {addContact && <div className='popup info'><form onSubmit={submitNewContact}>
-        <div className='row right'>
-          <button type="submit" value="" className='confirmBtn xClose' onClick={openAddContact}><i className='fas fa-close'></i></button>
+      {addContact && 
+      <div>
+        <div className='popup info'>
+          <div className='row top right'>
+            <button type="submit" value="" className='confirmBtn xClose' onClick={openAddContact}><i className='fas fa-close'></i></button>
+          </div>
+          <form onSubmit={submitNewContact}>
+            
+            <div className='row center'>
+              <input type="text" className='inputBox' placeholder='Name' id="name" autocomplete="off" onChange={e=>setContactName(e.target.value)}/>
+            </div>
+            <div className='row center'>
+              <input type="number" className='inputBox' placeholder='Phone number' id="phoneNum" autocomplete="off" onChange={e=>setContactNum(e.target.value)}/>
+            </div>
+            <div className='row center'>
+              <button type="submit" className='submitBtn'>ENTER</button>
+            </div>
+          </form>
         </div>
-        <div className='row center'>
-          <input type="text" className='inputBox' placeholder='Name' id="name" autocomplete="off" onChange={e=>setContactName(e.target.value)}/>
-        </div>
-        <div className='row center'>
-          <input type="number" className='inputBox' placeholder='Phone number' id="phoneNum" autocomplete="off" onChange={e=>setContactNum(e.target.value)}/>
-        </div>
-        <div className='row center'>
-          <button type="submit" className='submitBtn'>ENTER</button>
-        </div>
-      </form></div>}
+        <div className='popupCoverup'></div>
+      </div>}
       
     </div>
   )

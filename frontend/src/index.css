@@ -19,6 +19,7 @@ code {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 .row.center{
   justify-content: center;
@@ -43,18 +44,23 @@ code {
   align-items: center;
 }
 
+.row.inline{
+  /*to use flex in inline-block*/
+  display: inline-flex;
+}
+
 .col-0{
-  flex: 1 1 0rem;
-  padding: 1rem;
+  flex: 1 1 0vh;
+  padding: 1vh;
 }
 
 .col-1{
-  flex: 1 1 25rem;
-  padding: 1rem;
+  flex: 1 1 10vh;
+  padding: 1vh;
 }
 
 .col-2{
-  flex: 2 1 50rem;
+  flex: 2 1 50vh;
 }
 
 .keyNum{
@@ -77,8 +83,6 @@ code {
   margin: 5px;
   background: transparent;
   /* float: right; */
-  
-  
 }
 
 .keyNum:hover{
@@ -109,6 +113,7 @@ code {
   height: 100vh;
   min-width: 10rem;
   max-width: 35rem;
+  /* width: 54vh; */
   /* min-height: 50rem; */
   background:
       linear-gradient(rgb(111, 0, 255), transparent),
@@ -210,8 +215,8 @@ input.phoneNum {
                0 0 50px #14ad21,
                0 0 50px #14ad21;
   color: #fff;
-  font-size: 8vh;
-  width: 45vh;
+  font-size: 6vh;
+  width: 35vh;
   height: 10vh;
 }
 
@@ -253,7 +258,7 @@ input[type=number] {
 }
 
 .contentRow{
-  padding: 3rem;
+  padding: 2vh;
   color: #fff;
   font-size: 4vh;
 }
@@ -313,6 +318,7 @@ input[type=number] {
 
 .popup.info{
   background-color:rgb(43, 110, 197);
+  padding: 0vh 3vh 3vh 3vh;
 }
 
 .popup.error{
@@ -422,6 +428,10 @@ input[type=number] {
 .callButton.red{
   background-color: #ff0000;
   color: #fff;
+}
+
+.callButton.dial{
+  width: 5rem;
 }
 
 .hangupIcon{
@@ -536,4 +546,43 @@ tr:nth-child(even){
 
 .timer > span{
   font-size: 4vh;
+}
+
+.confirmBtn{
+  color: #fff;
+}
+
+/* div.scrollable{
+  overflow-y: scroll;
+  height: 64vh;       
+  overflow-y: auto;    
+  overflow-x: hidden;
+  width: 100%;
+  background:
+      linear-gradient(rgb(10, 133, 190), transparent),
+      linear-gradient(to top left, rgb(53, 171, 226), transparent),
+      linear-gradient(to top right, rgb(15, 84, 235), transparent);
+  color: #fff;
+} */
+
+
+/*can't use responsive text here. Bigger screen must display more texts*/
+.displayNameContact{
+  color: #fff;
+  /* font-size: 2.1vh; */
+  font-size: 1.2rem;
+}
+
+.displayNumberContact{
+  color: #fff;
+  /* font-size: 2vh; */
+  font-size: 1rem;
+}
+
+.scrollableDiv{
+  overflow-y: scroll;
+  height: 70vh;       
+  overflow-y: auto;    
+  overflow-x: hidden;
+  width: 100%;
 }

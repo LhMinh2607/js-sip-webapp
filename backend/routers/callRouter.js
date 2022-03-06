@@ -6,7 +6,22 @@ import CallLog from '../entities/CallLog.js';
 
 const callRouter = express.Router();
 callRouter.get('/log/list', expressAsyncHandler(async (req, res)=>{
-    const calllog = await CallLog.find({});
+    // const calllog = await CallLog.find({}).sort({createdAt: -1});
+
+    const calllog = await CallLog.aggregate([
+    {$sort: {createdAt: -1}},
+    {$group: {
+        _id:{ $dateToString: { format: "%Y-%m-%d", date: "$createdAt"} },
+        // detailDate :{ date: "$createdAt"},
+        list: { $push: "$$ROOT" },
+        count: { $sum: 1 },
+    }}, 
+    {$sort: {
+        _id: -1
+    }}
+    ]);
+
+    
 
     res.send(calllog);
 }));

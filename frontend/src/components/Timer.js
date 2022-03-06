@@ -28,7 +28,7 @@ export default function Timer(props) {
     return (
     <div style={{textAlign: 'center'}}>
         <div className='timer'>
-            <span>{hours}</span><span>:</span><span>{minutes}</span><span>:</span><span>{seconds}</span>
+            <span>{hours<10 ? "0"+hours : hours}</span><span>:</span><span>{minutes<10 ? "0"+minutes : minutes}</span><span>:</span><span>{seconds<10 ? "0"+seconds : seconds}</span>
         </div>
         {/* <p>{isRunning ? 'Running' : 'Not running'}</p> */}
         {/* <button onClick={start}>Start</button> */}

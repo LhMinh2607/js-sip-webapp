@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function DateComponent(props) {
 
-    const {passedDate, onlyTime} = props; //onlyTime = HH:mm, onlyDate = dd/MM/yyyy
+    const {passedDate, onlyTime, onlyDate} = props; //onlyTime = HH:mm, onlyDate = dd/MM/yyyy
 
     const date = new Date(passedDate);
     const publishedHour = date.getHours();
@@ -16,9 +16,9 @@ export default function DateComponent(props) {
 
         <div>
             {props.children}
-            {publishedHour+":"}
-            {
-                publishedMin < 10 ? <>0{publishedMin}</> : publishedMin
+            {!onlyDate && publishedHour+":"}
+            {!onlyDate && 
+                (publishedMin < 10 ? <>0{publishedMin}</> : publishedMin)
             }
                 
             {!onlyTime &&
