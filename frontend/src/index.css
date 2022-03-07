@@ -586,3 +586,42 @@ tr:nth-child(even){
   overflow-x: hidden;
   width: 100%;
 }
+
+.callStartedIcon{
+  color: #fff;
+}
+
+.callStartedIcon > .fa-arrow-up{
+  color:rgb(45, 235, 140);
+  font-size: 0.7rem;
+  transform: rotate(45deg);
+
+}
+
+.callReceivedIcon> .fa-arrow-up{
+  color:rgb(45, 235, 140);
+  transform: translate(2rem, -2rem);
+  transform: rotate(-145deg);
+}
+
+.callNotPickedUpIcon> .fa-ban{
+  color:#ff0000;
+  font-size: 0.7rem;
+
+}
+
+.callNoData> .fa-question{
+  color: #ffc815;
+  font-size: 0.7rem;
+}
+
+.toolTip{
+  width: 10rem;
+  height: 2rem;
+  color:#000000;
+  background-color: #fff;
+  visibility: hidden;
+  border: solid 1rem;
+}
+
+

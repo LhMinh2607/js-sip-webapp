@@ -7,9 +7,10 @@ import MessageBox from './MessageBox';
 import Timer from './Timer';
 import OptionDialogBox from './OptionDialogBox';
 import { getAContact, getAllContact, saveAContact } from '../Actions/contactActions';
-import { CONTACT_SAVE_RESET } from '../consts.js/CallConsts';
+import { CALL_LOG_RESET, CONTACT_SAVE_RESET } from '../consts.js/CallConsts';
 import DateComponent from '../components/DateComponent';
 import { useStopwatch  } from 'react-timer-hook'; //from react-timer-hook
+import TimeConverter from './TimeConverter';
 
 
 export default function Keypad() {
@@ -26,7 +27,7 @@ export default function Keypad() {
   const [contactName, setContactName] = useState('');
   const [addContact, setAddContact] = useState(false);
   const [callStartedBy, setCallStartedBy] = useState('You');
-  const [callEndedBy, setCallEndedBy] = useState({number: num, name: name});
+  const [callEndedBy, setCallEndedBy] = useState('');
   const [callId, setCallId] = useState('');
   const [totalLength, setTotalLength] = useState(0);
 
@@ -99,6 +100,10 @@ export default function Keypad() {
     })
     
     rtcSession.on('ended', (e) => {
+      document.getElementById("invisi").style.visibility = "hidden";
+    })
+
+    rtcSession.on('failed', (e) => {
       document.getElementById("invisi").style.visibility = "hidden";
     })
     
@@ -188,34 +193,36 @@ export default function Keypad() {
 
   const dispatch = useDispatch();
 
-  const makeCall = () => {
+  const logCall = () =>{
+    
     audioAmbientClick.play();
-
     if(num.length>10){
       setMessageBoxContent('10 digit-number only');
       setOpenPopup(true);
       setNum("");
     }else{
-      
-      document.getElementById("invisi").style.visibility = "visible";
-      dispatch(makeACall(num, name, callStartedBy, ua));}
       dispatch(logACall(num, name, callStartedBy));
-      
+    }
+    
+  }
+
+  const makeCall = (logId) => {
+
+    // if(num.length>10){
+    //   setMessageBoxContent('10 digit-number only');
+    //   setOpenPopup(true);
+    //   setNum("");
+    // }
+    document.getElementById("invisi").style.visibility = "visible";
+    console.log("Keypad log._id="+logId);
+    dispatch(makeACall(num, name, callStartedBy, ua, logId));
     // JsSIP.debug.enable('JsSIP:*');
-    
     //JsSIP.debug.enable('JsSIP:Transport JsSIP:RTCSession*');
-
     // let pc = new RTCPeerConnection();
-
     // Register callbacks to desired call events
-    
-
-    
-
     // ua.call('sip:106@2-test1.gcalls.vn:50061', options);
     //coolPhone.call('sip:'+extension+'@'+server, options);
     // dispatch(makeACall("0981232607"));
-
     // alert('call in progress');
   }
 
@@ -350,17 +357,22 @@ export default function Keypad() {
       start();
       // console.log(callId);
     }
-    if(log){
-      setCallId(log._id);
+    if(log && log._id && loadingCall===false && connected===null){
+      makeCall(log._id);
       console.log("log._id="+log._id);
+      dispatch({type: CALL_LOG_RESET});
+      // setCallId(log._id);
+      // console.log(log._id);
+      
     }
+    
     // alert(callId);
-    console.log('callId='+callId);
+    // console.log('callId='+callId);
     
     // if(connected===true){
     // alert(endCallSession);
     // }
-  },[loadingCall, connected, openPopup, endCallSession, log, callId]);
+  },[loadingCall, connected, openPopup, log]);
 
   return (
     <div>
@@ -398,7 +410,7 @@ export default function Keypad() {
 
           </div>
           <div className='keyRow'>
-            <button type="submit" onClick={makeCall} className='callButton'><i className='fa fa-phone'></i></button>
+            <button type="submit" onClick={logCall} className='callButton'><i className='fa fa-phone'></i></button>
           </div>
           <div>
           </div>
@@ -464,8 +476,8 @@ export default function Keypad() {
         </div> */}
         {keypadMode==='contact' && 
           <>
-            <div className='row right'><button onClick={openContact} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button></div>
-            <div className='row right'><button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div>
+            <div className='row center'><button onClick={openContact} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button>
+           <button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div>
               <div className='row inline scrollableDiv'>
                 {/* <table>
                   <thead>
@@ -513,7 +525,6 @@ export default function Keypad() {
         }
         {keypadMode==='history' &&
           <div><div className='row right'><button onClick={openHistory} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button></div>
-            <div className='row right'><button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div>
               {/* <div className='row scrolltable'>
                 <table>
                   <thead>
@@ -563,14 +574,18 @@ export default function Keypad() {
                     <div key={hist._id}>
                       <div className='row center displayNumberContact'>{hist._id}</div>
                       {hist.list.map(l=>(
-                        <div className='row left inline' key={l._id}>
+                        <div className='row left inline' key={l._id} title={l.callEndedWithCause ?( (l.callEndedWithCause.includes('Canceled') || l.callEndedWithCause.includes('Terminated')) ? "You made this call" : l.callEndedWithCause.includes('failed') && "The call was hung up") : "No data available (mostly because the call log wasn't completed in this period of development)"}>
                           <div className='col-1 inline'>
-                            <div className='displayNameContact row left'>{l.name}</div><div className='displayNumberContact row left'>{l.phoneNum}</div>
+                            <div className='displayNameContact row left' >
+                            {l.callEndedWithCause ? ((l.callEndedWithCause.includes('Canceled') || l.callEndedWithCause.includes('Terminated')) ?  <div className='callStartedIcon'><i className='fa fa-phone'></i><i className='fa fa-arrow-up'></i></div> : l.callEndedWithCause.includes('failed') && <div className='callNotPickedUpIcon'><i className='fa fa-phone'></i><i className='fa fa-ban'></i></div>) :  <div className='callNoData'><i className='fa fa-phone'></i><i className='fa fa-question'></i></div>}
+                            {l.name}</div>
+                            <div className='displayNumberContact row left'>{l.phoneNum}</div>
+                            <div className='displayNumberContact row left'>{l.length && <TimeConverter timeInSec={Math.round(l.length)}></TimeConverter>}</div>
                           </div>
-                          <div className='col-1 inline'>
+                          <div className='col-0 inline'>
                             <div className='row'>
-                              <div className='col-1 right displayNumberContact'><DateComponent passedDate={l.createdAt} onlyTime={true}></DateComponent></div>
-                              <div className='col-1 right'><button className='callButton dial' value={l.phoneNum+"|"+l.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
+                              <div className='col-0 right displayNumberContact'><DateComponent passedDate={l.createdAt} onlyTime={true}></DateComponent></div>
+                              <div className='col-0 right'><button className='callButton dial' value={l.phoneNum+"|"+l.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
                             </div>
                             
                           </div>
@@ -613,7 +628,7 @@ export default function Keypad() {
         </div>
         <div className='popupCoverup'></div>
       </div>}
-     
+      {/* <div className='toolTip'>ToolTips</div> */}
       
     </div>
   )

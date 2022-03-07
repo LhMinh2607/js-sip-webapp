@@ -48,10 +48,14 @@ callRouter.post('/log', expressAsyncHandler(async (req, res)=>{
 }));
 
 callRouter.put('/updateLog/:id', expressAsyncHandler(async (req, res)=>{
-    console.log(req.params.id);
+    console.log("updateLog for id:"+req.params.id);
     const calllog = await CallLog.findById(req.params.id);
     if(calllog){
-        calllog.length = req.body.length;
+        if(req.body.length){
+            calllog.length = req.body.length;
+        }else{
+            calllog.length = 0;
+        }
         calllog.endedBy = req.body.callEndedBy;
         calllog.callEndedWithCause = req.body.cause;
         const newCallLog = await calllog.save();

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET, CALL_UPDATE_LOG_FAILED, CALL_UPDATE_LOG_REQUEST, CALL_UPDATE_LOG_SUCCESSFUL, HISTORY_LIST_FAILED, HISTORY_LIST_REQUEST, HISTORY_LIST_SUCCESSFUL } from '../consts.js/CallConsts';
+import { CALL_CANCELED_FAILED, CALL_CANCELED_REQUEST, CALL_CANCELED_SUCCESSFUL, CALL_CONNECTED, CALL_DISCONNECTED, CALL_FAILED, CALL_IN_PROGRESS, CALL_LOG_FAILED, CALL_LOG_REQUEST, CALL_LOG_RESET, CALL_LOG_SUCCESSFUL, CALL_REQUEST, CALL_RESET, CALL_UPDATE_LOG_FAILED, CALL_UPDATE_LOG_REQUEST, CALL_UPDATE_LOG_SUCCESSFUL, HISTORY_LIST_FAILED, HISTORY_LIST_REQUEST, HISTORY_LIST_SUCCESSFUL } from '../consts.js/CallConsts';
 import JsSIP from "jssip";
 
 
@@ -17,19 +17,21 @@ export const logACall = (phoneNumber, name, callStartedBy) => async (dispatch) =
     }
 };
 
-// export const updateACallLog = (callEndedBy, length, cause) => async (dispatch) =>{
-//     dispatch({type: CALL_UPDATE_LOG_REQUEST, payload: {callEndedBy, length, cause}});
-//     try{
-//         const {data} = await axios.post(`/api/call/updateLog`, {callEndedBy, length, cause});
-//         dispatch({type: CALL_UPDATE_LOG_SUCCESSFUL, payload: data});
-//     }catch(error){
-//         dispatch({type: CALL_UPDATE_LOG_FAILED, 
-//             payload: error.response 
-//             && error.response.data.message 
-//             ? error.response.data.message
-//             : error.message,});
-//     }
-// };
+export const updateACallLog = (callEndedBy, length, cause, callId) => async (dispatch) =>{ //if call is canceled by remote
+    dispatch({type: CALL_UPDATE_LOG_REQUEST, payload: {callEndedBy, length, cause, callId}});
+    try{
+        const {data} = await axios.put(`/api/call/updateLog/${callId}`, {callEndedBy, length, cause, callId});
+        dispatch({type: CALL_UPDATE_LOG_SUCCESSFUL, payload: data});
+        dispatch({type: CALL_DISCONNECTED});
+        dispatch({type: CALL_RESET});
+    }catch(error){
+        dispatch({type: CALL_UPDATE_LOG_FAILED, 
+            payload: error.response 
+            && error.response.data.message 
+            ? error.response.data.message
+            : error.message,});
+    }
+};
 
 export const cancelCall = (callEndedBy, length, cause, id) => async (dispatch) =>{
     dispatch({type: CALL_CANCELED_REQUEST, payload: {callEndedBy, length, cause, id}});
@@ -51,15 +53,17 @@ export const cancelCall = (callEndedBy, length, cause, id) => async (dispatch) =
 
 
 
-export const makeACall = (phoneNumber, name, callStartedBy, ua) => async (dispatch) =>{
+export const makeACall = (phoneNumber, name, callStartedBy, ua, callId) => async (dispatch) =>{
     dispatch({
         type: CALL_REQUEST, payload: {phoneNumber, name, callStartedBy}
     });
-    
+    console.log(callId);
+
     const target = phoneNumber;
 
     ua.start();
     
+    var start_time = new Date();
 
     var eventHandlers = {
         progress: function(e) {
@@ -101,18 +105,33 @@ export const makeACall = (phoneNumber, name, callStartedBy, ua) => async (dispat
             }
                 console.log('call failed with cause: '+ e.cause);
                 dispatch({type: CALL_FAILED, payload: 'call failed with cause: '+ e.cause});
+                dispatch(updateACallLog(phoneNumber, 0, "Call failed", callId));
+                dispatch({type: CALL_DISCONNECTED});
+                dispatch({type: CALL_RESET});
             },
-            
         ended: function(e) {
-            if (e.cause === JsSIP.C.causes.CANCELED) {
+            
+            if (e.cause === JsSIP.C.causes.CANCELED) {//canceled by remote or local
                 //ua.sendMessage(target, 'The receiver cancelled the phone call!');
             }
-            dispatch({type: CALL_DISCONNECTED});
-            dispatch({type: CALL_RESET});
-            console.log('call ended with cause: '+ e.cause);
+            if (e.cause === JsSIP.C.causes.BYE) {//terminated by remote or local
+                //ua.sendMessage(target, 'The receiver cancelled the phone call!');
+
+                //through testing, somehow this ended function is called 2 seconds late compare to the real session time
+                //session_time when terminated by remote is still not accurate 
+                console.log("ended at"+new Date());
+                const end_time = new Date();
+                console.log(start_time + " - " + end_time);
+                const session_length = Math.abs(new Date() - start_time)/1000; 
+                dispatch(updateACallLog(phoneNumber, session_length, "Terminated by remote", callId))
+            }
             
+            
+            console.log('call ended with cause: '+ e.cause);
         },
         confirmed: function(e) {
+            console.log("started at"+new Date());
+            start_time = new Date();
             console.log('call confirmed');
             dispatch({type: CALL_CONNECTED});
             // var audio = new Audio();
