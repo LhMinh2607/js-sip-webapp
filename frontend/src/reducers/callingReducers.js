@@ -40,11 +40,11 @@ export const cancelCallReducer = (state = {loading: false}, action) =>{
 export const loggingACallReducer = (state = {loading: false, log: {}}, action) =>{
     switch(action.type){
         case CALL_LOG_REQUEST:
-            return {loadingLog: true, log: {}};
+            return {loading: true, log: {}};
         case CALL_LOG_SUCCESSFUL:
-            return {loadingLog: false, log: action.payload};
+            return {loading: false, log: action.payload};
         case CALL_LOG_FAILED:
-            return {loadingLog: false, errorLog: action.payload};
+            return {loading: false, error: action.payload};
         case CALL_LOG_RESET:
             return {};
         default:
@@ -55,11 +55,11 @@ export const loggingACallReducer = (state = {loading: false, log: {}}, action) =
 export const historyListReducer = (state = {loading: false}, action) =>{
     switch(action.type){
         case HISTORY_LIST_REQUEST:
-            return {loadingLog: true, history: null};
+            return {loading: true, history: null};
         case HISTORY_LIST_SUCCESSFUL:
-            return {loadingLog: false, history: action.payload};
+            return {loading: false, history: action.payload};
         case HISTORY_LIST_FAILED:
-            return {loadingLog: false, errorLog: action.payload};
+            return {loading: false, error: action.payload};
         default:
             return state;
     }
@@ -68,13 +68,15 @@ export const historyListReducer = (state = {loading: false}, action) =>{
 export const updatingACallReducer = (state = {loading: false, log: null}, action) =>{
     switch(action.type){
         case CALL_UPDATE_LOG_REQUEST:
-            return {loadingLog: true, updatedLog: null};
+            return {loading: true, updatedLog: null};
         case CALL_UPDATE_LOG_SUCCESSFUL:
-            return {loadingLog: false, updatedLog: action.payload};
+            return {loading: false, updatedLog: action.payload};
         case CALL_UPDATE_LOG_FAILED:
-            return {loadingLog: false, errorLog: action.payload};
+            return {loading: false, error: action.payload};
         default:
             return state;
     }
 }
+
+
 

@@ -9,6 +9,8 @@ const contactSchema = new mongoose.Schema({
     },
 );
 
+contactSchema.index({ name: 'text', phoneNum: 'text' });
+
 const Contact = mongoose.model('Contact', contactSchema);
 
 export default Contact;

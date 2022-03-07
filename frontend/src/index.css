@@ -220,6 +220,22 @@ input.phoneNum {
   height: 10vh;
 }
 
+input.inputBoxS{
+  background-color: #fff;
+  padding: 4vh;
+  border-radius: 4vh;
+  width: 100%;
+  box-sizing:border-box;
+  font-size: 2vh;
+}
+
+input.searchBar{
+  background-color: #fff;
+  width: 100%;
+  border-radius: 1vh;
+  border: 0rem;
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -261,6 +277,7 @@ input[type=number] {
   padding: 2vh;
   color: #fff;
   font-size: 4vh;
+  height: 4vh;
 }
 
 .contentRow.displayNumber{
@@ -338,28 +355,15 @@ input[type=number] {
   0%{
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) scale(1);  
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 50%; 
   }
   50%{
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%) scale(1.4);  
+    opacity: 80%;
   }
-  /*60%{
-    transform: scale(1.1);
-  }
-  70%{
-    transform: scale(1.2);
-  }
-  80%{
-    transform: scale(1);
-  }
-  90%{
-    transform: scale(1.1);
-  }
-  100%{
-    transform: scale(1);
-  } */
 }
 
 @keyframes slideUpPopup {
@@ -624,4 +628,31 @@ tr:nth-child(even){
   border: solid 1rem;
 }
 
+.contactMenuBtn{
+  width: 4vh;
+  color: #fff;
+  height: 4vh;
+  border-radius: 2vh;
+  font-size: 2vh;
+  background-color: #14ad21;
+  border: 0rem;
+}
 
+.contactMenuBtn:hover{
+  filter: brightness(50%);
+  transition: 0.2s;
+  border-radius: 1vh;
+}
+
+.contactMenuBtn.remove{
+  background: #ff0000;
+}
+
+.contactMenuBtn.edit{
+  background: #00273d;
+}
+
+.default{
+  border-top: 1px solid rgb(8, 120, 224);
+  width: 80%;
+}

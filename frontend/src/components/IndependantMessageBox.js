@@ -1,13 +1,20 @@
 import React, { useState } from 'react'
 
-export default function MessageBox(props) { //MessageBox that handles external function
-  //This MessageBox depends on external states
+export default function IndependentMessageBox(props) { //MessageBox that opens on an event and closes on its own)
+  //This MessageBox is independant on other external function components' states and functions
 
-  const {message, open, handleClosePopup, type} = props;
+
+  let MenuSelectionClick = new Audio("/MenuSelectionClick.mp3");
+  let audioAmbientClick = new Audio("/AmbientClick.mp3");
+
+  const {message, type} = props;
+
+  const [open, setOpen] = useState(true);
 
   const closePopup = () =>{
-    handleClosePopup();
-    // alert(open);
+    setOpen(false);
+    MenuSelectionClick.play();
+    audioAmbientClick.play();
   }
 
   return (

@@ -6,11 +6,14 @@ import JsSIP from "jssip";
 import MessageBox from './MessageBox';
 import Timer from './Timer';
 import OptionDialogBox from './OptionDialogBox';
-import { getAContact, getAllContact, saveAContact } from '../Actions/contactActions';
+import { getAContact, getAllContact, removeAContact, saveAContact, searchContact } from '../Actions/contactActions';
 import { CALL_LOG_RESET, CONTACT_SAVE_RESET } from '../consts.js/CallConsts';
 import DateComponent from '../components/DateComponent';
 import { useStopwatch  } from 'react-timer-hook'; //from react-timer-hook
 import TimeConverter from './TimeConverter';
+import { signin, signup } from '../Actions/userActions';
+import YesNoBox from './YesNoBox';
+import IndependentMessageBox from './IndependantMessageBox';
 
 
 export default function Keypad() {
@@ -28,8 +31,14 @@ export default function Keypad() {
   const [addContact, setAddContact] = useState(false);
   const [callStartedBy, setCallStartedBy] = useState('You');
   const [callEndedBy, setCallEndedBy] = useState('');
-  const [callId, setCallId] = useState('');
   const [totalLength, setTotalLength] = useState(0);
+  const [signinBox, setSigninBox] = useState(false);
+  const [uri, setURI] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [signupBox, setSignupBox] = useState(false);
+  const [idToDelete, setIdToDelete] = useState('');
+  const [keyword, setKeyword] = useState('');
 
   const {
     seconds,
@@ -45,92 +54,117 @@ export default function Keypad() {
   const stop = () =>{
     pause();
   }
+
+  const callingStatus = useSelector(state=>state.callingStatus);
+  const {loading: loadingCall, error: errorCall, connected} = callingStatus;
+
+  const contactSaving = useSelector(state=>state.contactSaving);
+  const {loading: loadingSaving, error: errorSaving, contact} = contactSaving;
+  
+  const contactList = useSelector(state=>state.contactList);
+  const {loading: loadingList, error: errorList, contacts} = contactList;
+
+  const contactDetail = useSelector(state=>state.contactDetail);
+  const {loading: loadingDetail, error: errorDetail, contactInfo} = contactDetail;
+
+  const historyList = useSelector(state=>state.historyList);
+  const {loading: loadingHistory, error: errorHistory, history} = historyList;
+
+  const loggingACall = useSelector(state=>state.loggingACall);
+  const {loading: loadingLog, error: errorLog, log} = loggingACall
+
+  const userSignin = useSelector(state=>state.userSignin);
+  const {loading: loadingSignin, error: errorSignin, userInfo} = userSignin;
+
+  const contactSearching = useSelector(state=>state.contactSearching);
+  const {loading: loadingSearch, error: errorSearch, results}= contactSearching;
   
   
 
   var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
 
-  var configuration = {
+  if(userInfo){
+    var configuration = {
       sockets  : [ socket ],
-      uri      : '105@2-test1.gcalls.vn:50061',
-      password : 'test1105',
+      uri      : userInfo.uri,
+      password : userInfo.displayPass,
       session_timers: false,
       display_name: name,
-  };
+    };
 
-  var ua = new JsSIP.UA(configuration);
+    var ua = new JsSIP.UA(configuration);
 
-  
-
-  JsSIP.debug.disable('JsSIP:*');
-
-  ua.on('newRTCSession', function(e){ 
-    var remoteAudio =  window.document.createElement('audio');
-    window.document.body.appendChild(remoteAudio);
-
-    var rtcSession = e.session;
     
 
-    rtcSession.connection.addEventListener('addstream',function(e) {  // Or addtrack
-      remoteAudio.srcObject = e.stream;
-      remoteAudio.play();
+    JsSIP.debug.disable('JsSIP:*');
+
+    ua.on('newRTCSession', function(e){ 
+      var remoteAudio =  window.document.createElement('audio');
+      window.document.body.appendChild(remoteAudio);
+
+      var rtcSession = e.session;
+      
+
+      rtcSession.connection.addEventListener('addstream',function(e) {  // Or addtrack
+        remoteAudio.srcObject = e.stream;
+        remoteAudio.play();
+      });
+
+      // rtcSession.connection.addEventListener('removestream',function(e) { 
+      //   alert('yes');
+      //   remoteAudio.srcObject = null;
+      //   remoteAudio.stop();
+      //   document.getElementById("invisi").style.visibility = "hidden";
+      // });
+
+      // rtcSession.connection.addEventListener('ended', function(e){
+      //   alert('end');
+      //   document.getElementById("invisi").style.visibility = "hidden";
+      // })
+
+      document.getElementById("endButton").addEventListener('click',function(e) { 
+        // console.log("loading="+loadingCall);
+        // console.log("loading="+connected);
+        // console.log("loading="+log._id);
+        // cancel(rtcSession);
+        rtcSession.terminate();
+        // document.getElementById("invisi").style.visibility = "hidden";
+        // var elem = document.getElementsByTagName("audio"); 
+        // elem.parentNode.removeChild(elem);
+      })
+      
+      rtcSession.on('ended', (e) => {
+        document.getElementById("invisi").style.visibility = "hidden";
+      })
+
+      rtcSession.on('failed', (e) => {
+        document.getElementById("invisi").style.visibility = "hidden";
+      })
+      
+      
+      // rtcSession.on('connection', function(e2) {
+      //     alert(' *** connection', e.originator, e2, e.connection);
+
+      //     // onaddstream
+      //     e2.connection.onaddstream = function(e3) {
+      //         alert(' *** onaddstream', e.originator, e3);
+      //         remoteAudio.srcObject = e3.stream;
+      //         remoteAudio.play();
+      //     }
+      //     onremovestream
+      //     e2.connection.onremovestream = function(e3) {
+      //         alert(' *** onremovestream', e.originator, e3);
+      //         remoteAudio.srcObject = null;
+      //         remoteAudio.stop();
+      //     }
+      // });
+      // alert(JSON.stringify(rtcSession));
+      // if(rtcSession.getReceivers().length > 0) {
+      //     remoteAudio.src = window.URL.createObjectURL(rtcSession.getReceivers()[0]);
+      //     remoteAudio.play();
+      // }
     });
-
-    // rtcSession.connection.addEventListener('removestream',function(e) { 
-    //   alert('yes');
-    //   remoteAudio.srcObject = null;
-    //   remoteAudio.stop();
-    //   document.getElementById("invisi").style.visibility = "hidden";
-    // });
-
-    // rtcSession.connection.addEventListener('ended', function(e){
-    //   alert('end');
-    //   document.getElementById("invisi").style.visibility = "hidden";
-    // })
-
-    document.getElementById("endButton").addEventListener('click',function(e) { 
-      // console.log("loading="+loadingCall);
-      // console.log("loading="+connected);
-      // console.log("loading="+log._id);
-      // cancel(rtcSession);
-      rtcSession.terminate();
-      // document.getElementById("invisi").style.visibility = "hidden";
-      // var elem = document.getElementsByTagName("audio"); 
-      // elem.parentNode.removeChild(elem);
-    })
-    
-    rtcSession.on('ended', (e) => {
-      document.getElementById("invisi").style.visibility = "hidden";
-    })
-
-    rtcSession.on('failed', (e) => {
-      document.getElementById("invisi").style.visibility = "hidden";
-    })
-    
-    
-    // rtcSession.on('connection', function(e2) {
-    //     alert(' *** connection', e.originator, e2, e.connection);
-
-    //     // onaddstream
-    //     e2.connection.onaddstream = function(e3) {
-    //         alert(' *** onaddstream', e.originator, e3);
-    //         remoteAudio.srcObject = e3.stream;
-    //         remoteAudio.play();
-    //     }
-    //     onremovestream
-    //     e2.connection.onremovestream = function(e3) {
-    //         alert(' *** onremovestream', e.originator, e3);
-    //         remoteAudio.srcObject = null;
-    //         remoteAudio.stop();
-    //     }
-    // });
-    // alert(JSON.stringify(rtcSession));
-    // if(rtcSession.getReceivers().length > 0) {
-    //     remoteAudio.src = window.URL.createObjectURL(rtcSession.getReceivers()[0]);
-    //     remoteAudio.play();
-    // }
-  });
-  
+  }
 
   let audioBeep = new Audio("/beep.mp3");
   let audioAmbientClick = new Audio("/AmbientClick.mp3");
@@ -163,15 +197,18 @@ export default function Keypad() {
 
   const closePopup = () =>{
     setOpenPopup(false);
-    //alert(openPopup);
     audioMenuSlectionClick.play();
     dispatch({type: CONTACT_SAVE_RESET});
+  }
+
+  const closeSigninPopup = () =>{
+    setOpenPopup(false);
+    audioMenuSlectionClick.play();
   }
 
 
   const cancel = () =>{
     audioAmbientClick.play();
-    // console.log(callId);
     // console.log(log._id);
     // console.log("length="+totalLength);
     console.log("time="+hours+":"+minutes+":"+seconds);
@@ -196,6 +233,7 @@ export default function Keypad() {
   const logCall = () =>{
     
     audioAmbientClick.play();
+    // alert(userInfo.displayPass);
     if(num.length>10){
       setMessageBoxContent('10 digit-number only');
       setOpenPopup(true);
@@ -207,15 +245,17 @@ export default function Keypad() {
   }
 
   const makeCall = (logId) => {
-
+    // alert(userInfo.uri + " " + userInfo.password);
     // if(num.length>10){
     //   setMessageBoxContent('10 digit-number only');
     //   setOpenPopup(true);
     //   setNum("");
     // }
+    
     document.getElementById("invisi").style.visibility = "visible";
     console.log("Keypad log._id="+logId);
     dispatch(makeACall(num, name, callStartedBy, ua, logId));
+
     // JsSIP.debug.enable('JsSIP:*');
     //JsSIP.debug.enable('JsSIP:Transport JsSIP:RTCSession*');
     // let pc = new RTCPeerConnection();
@@ -312,23 +352,7 @@ export default function Keypad() {
     setAddContact(!addContact);
   }
 
-  const callingStatus = useSelector(state=>state.callingStatus);
-  const {loading: loadingCall, error: errorCall, connected} = callingStatus;
-
-  const contactSaving = useSelector(state=>state.contactSaving);
-  const {loading: loadingSaving, error: errorSaving, contact} = contactSaving;
   
-  const contactList = useSelector(state=>state.contactList);
-  const {loading: loadingList, error: errorList, contacts} = contactList;
-
-  const contactDetail = useSelector(state=>state.contactDetail);
-  const {loading: loadingDetail, error: errorDetail, contactInfo} = contactDetail;
-
-  const historyList = useSelector(state=>state.historyList);
-  const {loading: loadingHistory, error: errorHistory, history} = historyList;
-
-  const loggingACall = useSelector(state=>state.loggingACall);
-  const {loading: loadingLog, error: errorLog, log} = loggingACall
 
   // const [width, setWidth] = useState(window.innerWidth);
 
@@ -340,10 +364,57 @@ export default function Keypad() {
   //   return () => window.removeEventListener("resize", handleWindowResize);
   // }
 
+  const signinHandler = (e) =>{
+    audioAmbientClick.play();
+    e.preventDefault(); //prevent the form from being refreshed
+    dispatch(signin(uri, password));
+    setURI('');
+    setPassword('');
+  }
+
+  const signupHandler = (e) =>{
+    e.preventDefault(); //prevent the form from being refreshed
+    //sign in action
+    audioAmbientClick.play();
+    dispatch(signup(uri, password, displayName));
+    dispatch(signin(uri, password));
+  };
+
+  const openSignupBox = () =>{
+    audioAmbientClick.play();
+    setSigninBox(false);
+    setSignupBox(true);
+  }
+
+  const openSigninBox = () =>{
+    audioAmbientClick.play();
+    setSignupBox(false);
+    setSigninBox(true);
+  }
+
+  const removeContact = (e) =>{
+    dispatch(removeAContact(e.currentTarget.value));
+    dispatch(getAllContact());
+  }
+
+  const editContact = (e) =>{
+    openAddContact();
+  }
+
+  const search = (e) =>{
+    setKeyword(e.target.value);
+    dispatch(searchContact(e.target.value));
+  }
+
   useEffect(()=>{
     // window.scrollTo({
     //   top: 0, 
     // });
+    if(!userInfo){
+      setSigninBox(true);
+    }else{
+      setSigninBox(false);
+    }
     
     setPopupType('info');
     // handleWindowResize();
@@ -355,7 +426,6 @@ export default function Keypad() {
     if(connected){
       reset();
       start();
-      // console.log(callId);
     }
     if(log && log._id && loadingCall===false && connected===null){
       makeCall(log._id);
@@ -363,16 +433,13 @@ export default function Keypad() {
       dispatch({type: CALL_LOG_RESET});
       // setCallId(log._id);
       // console.log(log._id);
-      
     }
     
-    // alert(callId);
-    // console.log('callId='+callId);
     
     // if(connected===true){
     // alert(endCallSession);
     // }
-  },[loadingCall, connected, openPopup, log]);
+  },[loadingCall, connected, openPopup, log, userInfo, dispatch, idToDelete, keyword]);
 
   return (
     <div>
@@ -457,7 +524,7 @@ export default function Keypad() {
             </div>
           </div>
         }
-        {openPopup && <MessageBox type={popupType} message={messageBoxContent} open={openPopup} handleClosePopup={closePopup}></MessageBox>}
+        {openPopup && <MessageBox open={openPopup} type={popupType} message={messageBoxContent} handleClosePopup={closePopup}></MessageBox>}
         {/* {connected && <div>CONNECTED</div>} */}
         
         {/* <div className='popup cancel'>
@@ -476,9 +543,10 @@ export default function Keypad() {
         </div> */}
         {keypadMode==='contact' && 
           <>
-            <div className='row center'><button onClick={openContact} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button>
+          <div className='row center'><input className='searchBar' placeholder='Search here' onChange={search}></input></div>
+          <div className='row center'><button onClick={openContact} className='confirmBtn back'><i className='fa fa-mail-reply'></i></button>
            <button onClick={openAddContact} className='confirmBtn info'><i className='fa fa-plus'></i></button></div>
-              <div className='row inline scrollableDiv'>
+              {keyword==="" ? (<div className='row inline scrollableDiv'>
                 {/* <table>
                   <thead>
                     <tr>
@@ -515,12 +583,39 @@ export default function Keypad() {
                         <div className='displayNameContact row left'>{contact.name}</div><div className='displayNumberContact row left'>{contact.phoneNum}</div>
                       </div>
                       <div className='col-1 inline'>
-                        <div className='row right'><button className='callButton dial' value={contact.phoneNum+"|"+contact.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
+                        <div className='row right' title="Dial this number"><button className='contactMenuBtn' value={contact.phoneNum+"|"+contact.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
+                        <div className='row right' title="Remove this contact"><button className='contactMenuBtn remove' value={contact._id} onClick={removeContact}><i className='fa fa-trash'></i></button></div>
+                        <div className='row right' title="Remove this contact"><button className='contactMenuBtn edit' value={contact._id} onClick={editContact}><i className='fa fa-edit'></i></button></div>
                       </div>
+                      <div className='row right'><hr className='default'></hr></div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </div>) : 
+            (
+              <div className='row inline scrollableDiv'>
+                <div className='col-2'>
+                  {results && results.length>0 && results.map(result=>(
+                    <div className='row left inline' key={result._id}>
+                      <div className='col-1 inline'>
+                        <div className='displayNameContact row left'>{result.name}</div><div className='displayNumberContact row left'>{result.phoneNum}</div>
+                      </div>
+                      <div className='col-1 inline'>
+                        <div className='row right' title="Dial this number"><button className='contactMenuBtn' value={result.phoneNum+"|"+result.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
+                        <div className='row right' title="Remove this contact"><button className='contactMenuBtn remove' value={result._id} onClick={removeContact}><i className='fa fa-trash'></i></button></div>
+                        <div className='row right' title="Remove this contact"><button className='contactMenuBtn edit' value={result._id} onClick={editContact}><i className='fa fa-edit'></i></button></div>
+                      </div>
+                      <div className='row right'><hr className='default'></hr></div>
+                    </div>
+                  ))}
+                </div>
+            </div>)}
+          </>
+        }
+        {
+          keypadMode==='contact' && !keyword==="" &&
+          <>
+            
           </>
         }
         {keypadMode==='history' &&
@@ -587,8 +682,9 @@ export default function Keypad() {
                               <div className='col-0 right displayNumberContact'><DateComponent passedDate={l.createdAt} onlyTime={true}></DateComponent></div>
                               <div className='col-0 right'><button className='callButton dial' value={l.phoneNum+"|"+l.name} onClick={dialNum}><i className='fa fa-mobile'></i></button></div>
                             </div>
-                            
                           </div>
+                          <div className='row right'><hr className='default'></hr></div>
+
                         </div>
                       ))
                       }
@@ -599,12 +695,12 @@ export default function Keypad() {
             </div>
         }
         {openDialogBox && 
-          <OptionDialogBox open={openDialogBox} handleClosePopup={closeDialogBox} handleOpenContact={openContact} handleOpenHistory={openHistory}></OptionDialogBox>
+          <OptionDialogBox handleClosePopup={closeDialogBox} handleOpenContact={openContact} handleOpenHistory={openHistory}></OptionDialogBox>
         }
         {loadingSaving ? <></> : errorSaving ? (errorSaving.includes("E11000") ?
-          <MessageBox type="error" message="Duplicate phone number detected. Please check the number again." open={true} handleClosePopup={closePopup}></MessageBox> : <MessageBox type="error" message={errorSaving} open={true} handleClosePopup={closePopup}></MessageBox>) :
+          <IndependentMessageBox type="error" message="Duplicate phone number detected. Please check the number again."></IndependentMessageBox> : <IndependentMessageBox type="error" message={errorSaving}></IndependentMessageBox>) :
         contact && contact.success && 
-          <MessageBox message={contact.message} open={true} handleClosePopup={closePopup}></MessageBox>
+          <IndependentMessageBox message={contact.message}></IndependentMessageBox>
         }
       </div>
       {addContact && 
@@ -628,8 +724,67 @@ export default function Keypad() {
         </div>
         <div className='popupCoverup'></div>
       </div>}
-      {/* <div className='toolTip'>ToolTips</div> */}
-      
+      {signinBox && 
+        <div>
+          <div className='popup info'>
+            <div className='row top center displayNameContact'>
+              SIGN IN 
+            </div>
+            <form onSubmit={signinHandler}>
+              <div className='row center'>
+                <input type="text" className='inputBoxS' placeholder='URI' id="uri" autoComplete="new-password" onChange={e=>setURI(e.target.value)}/>
+              </div>
+              <div className='row center'>
+                <input type="password" className='inputBoxS' placeholder='Password' id="pass" autoComplete="new-password" onChange={e=>setPassword(e.target.value)}/>
+              </div>
+              {/* <div className='row center'>
+                <input type="text" className='inputBox' placeholder='Display Name' id="uri" autoComplete="off" onChange={e=>setDisplayName(e.target.value)}/>
+              </div> */}
+              <div className='row center'>
+                <button type="submit" className='submitBtn'>Submit</button>
+              </div>
+              <div className='row center'>
+                New here? <button className='confirmBtn' onClick={openSignupBox}>Sign up</button>
+              </div>
+            </form>
+          </div>
+          <div className='popupCoverup'></div>
+        </div>
+      }
+      {signupBox &&
+        <div>
+          <div className='popup info'>
+            <div className='row top center displayNameContact'>
+              SIGN UP
+            </div>
+            <form onSubmit={signupHandler}>
+              <div className='row center'>
+                <input type="text" className='inputBoxS' placeholder='URI' id="uri" autoComplete="new-password" onChange={e=>setURI(e.target.value)}/>
+              </div>
+              <div className='row center'>
+                <input type="password" className='inputBoxS' placeholder='Password' id="pass" autoComplete="new-password" onChange={e=>setPassword(e.target.value)}/>
+              </div>
+              <div className='row center'>
+                <input type="text" className='inputBoxS' placeholder='Display Name' id="uri" autoComplete="off" onChange={e=>setDisplayName(e.target.value)}/>
+              </div>
+              <div className='row center'>
+                <button type="submit" className='submitBtn'>Submit</button>
+              </div>
+              <div className='row center'>
+                Already here? <button className='confirmBtn' onClick={openSigninBox}>Sign in</button>
+              </div>
+            </form>
+          </div>
+          <div className='popupCoverup'></div>
+        </div>
+      }
+      {
+        loadingSignin ? <></> : errorSignin ? signinBox &&  
+        <IndependentMessageBox  type="error" message={errorSignin} ></IndependentMessageBox> : userInfo && <IndependentMessageBox type="info" message="Signed in Successfully" ></IndependentMessageBox>
+      }
+      {/* {removeContactBox &&
+        <YesNoBox message="ARE YOU SURE? IT CAN'T BE UNDONE" handleYes={removeContact} handleNo={setIdToDelete('')}></YesNoBox>
+      } */}
     </div>
   )
 }

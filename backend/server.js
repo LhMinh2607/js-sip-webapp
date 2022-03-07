@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import callRouter from './routers/callRouter.js';
 import dotenv from 'dotenv';
 import contactRouter from './routers/contactRouter.js';
+import accountRouter from './routers/accountRouter.js';
 
 // const express = require('express')
 dotenv.config();
@@ -22,6 +23,7 @@ err => {
 
 app.use('/api/call', callRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/account', accountRouter);
 
 app.get('/', (req, res) => {
     res.send('Server is ready!');
