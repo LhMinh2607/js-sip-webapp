@@ -4,8 +4,8 @@ export default function IndependentMessageBox(props) { //MessageBox that opens o
   //This MessageBox is independant on other external function components' states and functions
 
 
-  let MenuSelectionClick = new Audio("/MenuSelectionClick.mp3");
-  let audioAmbientClick = new Audio("/AmbientClick.mp3");
+  let MenuSelectionClick = new Audio("/assets/MenuSelectionClick.mp3");
+  let audioAmbientClick = new Audio("/assets/AmbientClick.mp3");
 
   const {message, type} = props;
 

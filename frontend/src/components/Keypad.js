@@ -81,9 +81,11 @@ export default function Keypad() {
   
   
 
-  var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
+  
 
   if(userInfo){
+
+    var socket = new JsSIP.WebSocketInterface('wss://sbc03.tel4vn.com:7444');
     var configuration = {
       sockets  : [ socket ],
       uri      : userInfo.uri,
@@ -166,9 +168,10 @@ export default function Keypad() {
     });
   }
 
-  let audioBeep = new Audio("/beep.mp3");
-  let audioAmbientClick = new Audio("/AmbientClick.mp3");
-  let audioMenuSlectionClick = new Audio("/MenuSelectionClick.mp3");
+  let audioBeep = new Audio("/assets/beep.mp3");
+  let audioAmbientClick = new Audio("/assets/AmbientClick.mp3");
+  let audioMenuSlectionClick = new Audio("/assets/MenuSelectionClick.mp3");
+  
 
 
   const input = (value) => { //Keypad
@@ -498,8 +501,8 @@ export default function Keypad() {
               <button type="submit" value="Forward" className='keyNum round'>Forward</button>
             </div>
           </div>
-          <div className='keyRow'>
-            
+          <div className='pan'>
+              
           </div>
         </div>: connected && 
           <div>
@@ -520,7 +523,10 @@ export default function Keypad() {
                 {/* <button onClick={pause}>Pause</button> */}
                 {/* {connectivity} */}
                 {/* <button onClick={reset}>Reset</button> */}
+              </div>
             </div>
+            <div className='pan'>
+
             </div>
           </div>
         }

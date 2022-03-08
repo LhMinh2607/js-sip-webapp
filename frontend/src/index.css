@@ -45,7 +45,6 @@ code {
 }
 
 .row.inline{
-  /*to use flex in inline-block*/
   display: inline-flex;
 }
 
@@ -67,10 +66,6 @@ code {
   width: 100%;
   max-width: 14vh;
   min-width: 2rem;
-  /* height: 100%;
-  max-height: 10rem;
-  min-height: 2rem; */
-  /* width: 16vh; */
   height: 14vh;
   color: #fff;
   background-color: transparent;
@@ -82,7 +77,6 @@ code {
   width: calc(32% - 1rem);
   margin: 5px;
   background: transparent;
-  /* float: right; */
 }
 
 .keyNum:hover{
@@ -109,12 +103,9 @@ code {
   width: 100%;
   border: 1px solid black;
   display: inline-block;
-  /* padding: 0rem 1rem 0rem 1rem; */
   height: 100vh;
   min-width: 10rem;
   max-width: 35rem;
-  /* width: 54vh; */
-  /* min-height: 50rem; */
   background:
       linear-gradient(rgb(111, 0, 255), transparent),
       linear-gradient(to top left, lime, transparent),
@@ -135,7 +126,6 @@ code {
   text-align: center;
   min-width: 3rem;
   font-size: 2vh;
-  /* height: 10vh; */
 }
 
 .keyContent{
@@ -159,7 +149,6 @@ code {
   min-width: 2rem;
   height: 6vh;
   font-size: 3vh;
-  /* box-shadow: 2rem; */
 }
 
 .callButton:hover{
@@ -193,14 +182,12 @@ input.inputBox{
 input{
   padding: 1vh;
   width: 20vh;
-  /* width: 100%; */
   height: 2vh;
   font-size: 3vh;
   margin: 1vh;
   text-align: center;
   border: 0rem;
   background-color: transparent;
-  /* opacity: 80%; */
 }
 
 input.phoneNum {
@@ -259,9 +246,7 @@ input[type=number] {
   -moz-box-sizing: border-box;
   width: calc(32% - 1rem);
   height: 14vh;
-  /* margin: 0.5vh; */
   background: transparent;
-  /* float: right; */
   width: 14vh;
   text-align: center;
 }
@@ -309,22 +294,12 @@ input[type=number] {
   transform: translate(-50%, -50%);
   z-index: 9000;
   padding: 3vh 3vh 3vh 3vh;
-  /* text-align: center; */
   color: #fff;
   border-radius: 2vh;
   font-size: 3vh;
   width: 30vh;
-  /* height: 20vh; */
   position: absolute;
   opacity: 100%;
-  /* left: 0; 
-  right: 0; 
-  margin-left: auto; 
-  margin-right: auto; 
-  top: 0;
-  bottom: 0;
-  margin-top: 40vh;
-  margin-bottom: auto; */
   background:
     linear-gradient(rgb(10, 66, 139), transparent),
     linear-gradient(to top, rgb(50, 122, 218), transparent),
@@ -470,8 +445,6 @@ button.submitBtn{
   color: #fff;
   font-size: 5vh;
   border: 0rem;
-  /* margin: 1vh; */
-  /* padding: 4vh; */
 }
 
 button.submitBtn:hover{
@@ -556,30 +529,15 @@ tr:nth-child(even){
   color: #fff;
 }
 
-/* div.scrollable{
-  overflow-y: scroll;
-  height: 64vh;       
-  overflow-y: auto;    
-  overflow-x: hidden;
-  width: 100%;
-  background:
-      linear-gradient(rgb(10, 133, 190), transparent),
-      linear-gradient(to top left, rgb(53, 171, 226), transparent),
-      linear-gradient(to top right, rgb(15, 84, 235), transparent);
-  color: #fff;
-} */
-
 
 /*can't use responsive text here. Bigger screen must display more texts*/
 .displayNameContact{
   color: #fff;
-  /* font-size: 2.1vh; */
   font-size: 1.2rem;
 }
 
 .displayNumberContact{
   color: #fff;
-  /* font-size: 2vh; */
   font-size: 1rem;
 }
 
@@ -655,4 +613,8 @@ tr:nth-child(even){
 .default{
   border-top: 1px solid rgb(8, 120, 224);
   width: 80%;
+}
+
+.pan{
+  height: 30vh;
 }
